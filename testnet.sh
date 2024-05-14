@@ -141,18 +141,18 @@ for (( i=0; i<$NUM_NODES; i++ )); do
       --networkid=${CHAIN_ID:-32382} \
       --http \
       --http.api=eth,net,web3 \
-      --http.addr=127.0.0.1 \
+      --http.addr=0.0.0.0 \
       --http.corsdomain="*" \
       --http.port=$((GETH_HTTP_PORT + i)) \
       --port=$((GETH_NETWORK_PORT + i)) \
       --metrics.port=$((GETH_METRICS_PORT + i)) \
       --ws \
       --ws.api=eth,net,web3 \
-      --ws.addr=127.0.0.1 \
+      --ws.addr=0.0.0.0 \
       --ws.origins="*" \
       --ws.port=$((GETH_WS_PORT + i)) \
       --authrpc.vhosts="*" \
-      --authrpc.addr=127.0.0.1 \
+      --authrpc.addr=0.0.0.0 \
       --authrpc.jwtsecret=$NODE_DIR/execution/jwtsecret \
       --authrpc.port=$((GETH_AUTH_RPC_PORT + i)) \
       --datadir=$NODE_DIR/execution \
@@ -175,9 +175,9 @@ for (( i=0; i<$NUM_NODES; i++ )); do
       --chain-config-file=$NODE_DIR/consensus/config.yml \
       --contract-deployment-block=0 \
       --chain-id=${CHAIN_ID:-32382} \
-      --rpc-host=127.0.0.1 \
+      --rpc-host=0.0.0.0 \
       --rpc-port=$((PRYSM_BEACON_RPC_PORT + i)) \
-      --grpc-gateway-host=127.0.0.1 \
+      --grpc-gateway-host=0.0.0.0 \
       --grpc-gateway-port=$((PRYSM_BEACON_GRPC_GATEWAY_PORT + i)) \
       --execution-endpoint=http://localhost:$((GETH_AUTH_RPC_PORT + i)) \
       --accept-terms-of-use \
