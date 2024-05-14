@@ -365,7 +365,7 @@ func startSlip() {
 	http.HandleFunc("/ws/", handlers.HandleWebSocket(clientManager))
 	// http.HandleFunc("/", handlers.HomeHandler())
 
-	http.ListenAndServe("localhost:8888", nil)
+	http.ListenAndServe("0.0.0.0:8888", nil)
 }
 
 // startNode boots up the system node and all registered protocols, after which
