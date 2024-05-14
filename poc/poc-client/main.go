@@ -134,7 +134,7 @@ func main() {
 				if err != nil {
 					log.Println("Error deserializing proof: ", err)
 				}
-				result, validState := verifySPProof(proof, resMsg.BlockNr, resMsg.Address)
+				result, validState := verifySPProof(client, proof, resMsg.BlockNr, resMsg.Address)
 				log.Println(result, validState)
 
 			default:
@@ -316,8 +316,8 @@ func VerifyFraudProof(resMsg resmsg.ResponseMsg) bool {
 
 }
 
-func verifySPProof(proofTrie mpt.Proof, blockNr *big.Int, account common.Address) (bool, []byte) {
-	wsEndpoint := "ws://localhost:8100"
+func verifySPProof(c *client.Client, proofTrie mpt.Proof, blockNr *big.Int, account common.Address) (bool, []byte) {
+	wsEndpoint := c.BcWsEndpoint
 	client, err := ethclient.Dial(wsEndpoint)
 	if err != nil {
 		log.Fatal(err)
