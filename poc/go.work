@@ -1,0 +1,6 @@
+go 1.20
+
+use (
+	./poc-client
+	./poc-server
+)
