@@ -22,6 +22,7 @@ type ClientManager interface {
 	RemoveClient(id string)
 	GetClient(id string) *mClient.Client
 	SetClientPubK(id string, pubK []byte)
+	SetClientChannel(id string, channelID string)
 	PrintClientsMap()
 }
 
