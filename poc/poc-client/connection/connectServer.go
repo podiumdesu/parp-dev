@@ -6,6 +6,8 @@ import (
 	"poc-client/client"
 
 	"github.com/gorilla/websocket"
+	"math/rand"
+	"strconv"
 )
 
 // Connect PoC-Client-Backend to PoC-Server
@@ -15,6 +17,9 @@ func ConnectToServer(client *client.Client) *websocket.Conn {
 	// s := strings.Split(serverInfo, ":")
 	// port, clientID := s[0], s[1]
 	// url := "ws://localhost:" + port + "/ws/" + clientID
+	id := rand.Intn(10000000000)
+
+	client.ServerEndpoint = client.ServerEndpoint+strconv.Itoa(id)
 	conn, _, err := dialer.Dial(client.ServerEndpoint, nil)
 
 	if err != nil {
