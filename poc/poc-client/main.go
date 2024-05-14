@@ -103,6 +103,7 @@ func main() {
 				log.Println(string(msg))
 				var resMsg resmsg.ResponseMsg
 
+				log.Println("Size of the Tx response: %d bytes", len(msg))
 				err := json.Unmarshal(msg, &resMsg)
 				if err != nil {
 					log.Println("Unmarshal error: ", err)
