@@ -362,7 +362,7 @@ func startSlip() {
 
 	clientManager := manager.NewManager()
 
-	http.HandleFunc("/ws/", handlers.HandleWebSocket(clientManager, ""))
+	http.HandleFunc("/ws/", handlers.HandleWebSocket(clientManager))
 	// http.HandleFunc("/", handlers.HomeHandler())
 
 	http.ListenAndServe("localhost:8888", nil)

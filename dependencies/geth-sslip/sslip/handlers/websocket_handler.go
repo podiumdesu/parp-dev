@@ -66,8 +66,7 @@ const wsEndpointPort = 8100
 // 	// Implement or stub as necessary; returning nil or an error based on your scenario
 // }
 
-func HandleWebSocket(m *manager.Manager, contractAddress string) http.HandlerFunc {
-	contractAddress = "0x094D6cd9dA692A4c490C1F8AD3E74D089E3492D6"
+func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var upgrader = websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
@@ -130,6 +129,7 @@ func HandleWebSocket(m *manager.Manager, contractAddress string) http.HandlerFun
 				log.Println("Handshake msg: ", string(jsonHsMsg))
 
 				m.SetClientPubKB(clientID, hsMsg.Body.PubKB)
+				m.SetContractAddress(hsMsg.Body.ContractAddress)
 				log.Println("pubk has been set: ", m.GetClient(clientID).PubKeyB)
 
 				go func() {
@@ -419,15 +419,15 @@ func HandleWebSocket(m *manager.Manager, contractAddress string) http.HandlerFun
 				var position [32]byte
 				data := append(channelIdBytes, position[:]...)
 				slot := crypto.Keccak256Hash(data)
-				storageProof := generateStorageProof(contractAddress, slot.Hex(), blockHeader.Number)
+				storageProof := generateStorageProof(m.ContractAddress, slot.Hex(), blockHeader.Number)
 
-				res, validState := verifyStorageProof(storageProof, contractAddress, blockHeader.Root)
+				res, validState := verifyStorageProof(storageProof, m.ContractAddress, blockHeader.Root)
 				log.Println(res, validState)
 
 				responseSPBody := resmsg.ResponseSPBody{
 					SignedReqBody: req.SignedReqBody,
 					Proof:         storageProof.CustomSerialize(),
-					Address:       common.HexToAddress(contractAddress),
+					Address:       common.HexToAddress(m.ContractAddress),
 					BlockNr:       blockHeader.Number,
 				}
 
@@ -440,7 +440,7 @@ func HandleWebSocket(m *manager.Manager, contractAddress string) http.HandlerFun
 					CurrentBlockHeight: currentBlockHeader.Number,
 					ReturnValue:        []byte(validState),
 					Proof:              storageProof.CustomSerialize(),
-					Address:            common.HexToAddress(contractAddress),
+					Address:            common.HexToAddress(m.ContractAddress),
 					BlockNr:            blockHeader.Number,
 					Signature:          sig,
 				}
