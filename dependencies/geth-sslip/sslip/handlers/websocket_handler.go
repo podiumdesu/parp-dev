@@ -411,7 +411,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 				log.Println("Block number: ", blockHeader.Number.Text(16))
 
 				channelId := m.GetClientChannelID(clientID)
-				blockHeader, _ = wsClient.HeaderByNumber(context.Background(), big.NewInt(168))
+				blockHeader, _ = wsClient.HeaderByNumber(context.Background(), blockHeader.Number)
 
 				currentBlockHeader, _ := wsClient.HeaderByNumber(context.Background(), nil)
 
