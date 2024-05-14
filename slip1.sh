@@ -58,18 +58,18 @@ $GETH_BINARY \
     --networkid=${CHAIN_ID:-32382} \
     --http \
     --http.api=eth,net,web3,personal,miner,admin \
-    --http.addr=127.0.0.1 \
+    --http.addr=0.0.0.0 \
     --http.corsdomain="*" \
     --http.port=$((GETH_HTTP_PORT + i)) \
     --port=$((GETH_NETWORK_PORT + i)) \
     --metrics.port=$((GETH_METRICS_PORT + i)) \
     --ws \
     --ws.api=eth,net,web3 \
-    --ws.addr=127.0.0.1 \
+    --ws.addr=0.0.0.0 \
     --ws.origins="*" \
     --ws.port=$((GETH_WS_PORT + i)) \
     --authrpc.vhosts="*" \
-    --authrpc.addr=127.0.0.1 \
+    --authrpc.addr=0.0.0.0 \
     --authrpc.jwtsecret=$NODE_DIR/execution/jwtsecret \
     --authrpc.port=$((GETH_AUTH_RPC_PORT + i)) \
     --datadir=$NODE_DIR/execution \
