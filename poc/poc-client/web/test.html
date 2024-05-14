@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script>  
+window.addEventListener("load", function(evt) {
+    const output = document.getElementById("output");
+    const input = document.getElementById("input");
+
+    let ws
+
+    const backendPort = 8081
+
+    ws = new WebSocket("ws://localhost:" + backendPort + "/ws-client-fb-connect")
+    ws.onopen = (evt) => {
+        print("---Connected to the back end---");
+    }
+    ws.onclose = (evt) => {
+        print("---Connection to the back end closed---");
+        ws = null;
+    }
+    ws.onmessage = (evt) => {
+        // sendMessage(evt.data)
+        // print("RESPONSE: " + evt.data);
+        print("RESPONSE: " + evt.data);
+    }
+    ws.onerror = (evt) => {
+        print("ERROR: " + evt.data);
+    }
+
+    var print = (message) => {
+        var d = document.createElement("div");
+        d.textContent = message;
+        output.appendChild(d);
+        output.scroll(0, output.scrollHeight);
+    };
+
+    var sendXHR = (data, api) => {
+        var xhr = new XMLHttpRequest();
+        var params = "fe_msg=" + data
+        xhr.open("POST", "http://localhost:8081/"+api, true)
+        xhr.send(params)
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    console.log(`Message to ${api} has been processed`)
+                    var res = xhr.responseText
+                    console.log(`xhr res: ${res}`)
+                }
+            }
+        }
+    }
+
+	// var sendHandshakeRequest = function() {
+	// 	// ws.send("HANDSHAKE_REQUEST");
+	// 	var xhr = new XMLHttpRequest();
+	// 	xhr.open("POST", "http://localhost:8081/start-handshaking", "GSGS");
+	// 	xhr.onreadystatechange = function() {
+	// 		if (xhr.readyState === XMLHttpRequest.DONE) {
+	// 			if (xhr.status === 200) {
+	// 				console.log("Handshake request sent successfully");
+    //                 var res = xhr.responseText
+    //                 console.log("msg from client server that will go through the socket: " + res)
+    //                 ws.send(res)
+	// 			} else {
+	// 				console.error("Failed to send handshake request");
+	// 			}
+	// 		}
+	// 	};
+	// 	xhr.send();
+	// 	return false;
+	// };
+
+    // var sendMessage = function (data) {
+    //     console.log("Receive msg from server, going to forward to /receive: " + data)
+    //     // console.log(data)
+
+    //     var xhr = new XMLHttpRequest()
+    //     var params = "servermsg=" + data
+    //     xhr.open("POST", "http://localhost:8081/receive", true)
+    //     xhr.send(params)
+    //     xhr.onreadystatechange = function() {
+    //         if (xhr.readyState === XMLHttpRequest.DONE) {
+    //             if (xhr.status === 200) {
+    //                 console.log("Message has been processed")
+    //                 var res = xhr.responseText
+    //             }
+    //         }
+    //     }
+    // }
+    document.getElementById("open").onclick = function(evt) {
+        // if (ws) {
+        //     return false;
+        // }
+        const connInfo = document.getElementById("serverPort").value;
+		const serverPort = connInfo.split(":")[0];
+		const clientID = connInfo.split(":")[1];
+        sendXHR("/ws-server-connect", connInfo)
+
+        // ws = new WebSocket("ws://localhost:" + serverPort + "/echo/" + clientID);
+        // ws.onopen = function(evt) {
+        //     print("OPEN");
+        // }
+        // ws.onclose = function(evt) {
+        //     print("CLOSE");
+        //     ws = null;
+        // }
+        // ws.onmessage = function(evt) {
+        //     sendMessage(evt.data)
+        //     print("RESPONSE: " + evt.data);
+        // }
+        // ws.onerror = function(evt) {
+        //     print("ERROR: " + evt.data);
+        // }
+        // return false;
+    };
+
+    document.getElementById("handshake").onclick = function(evt) {
+        // console.log(input.value)
+        const input = document.getElementById("handshake-input").value
+		ws.send(input);
+        console.log(input)
+        return false;
+    };
+
+    document.getElementById("send").onclick = function(evt) {
+        if (!ws) {
+            return false;
+        }
+        print("SEND: " + input.value);
+        ws.send(input.value);
+        return false;
+    };
+
+    document.getElementById("close").onclick = function(evt) {
+        if (!ws) {
+            return false;
+        }
+        ws.close();
+        return false;
+    };
+});
+</script>
+</head>
+<body>
+<table>
+<tr><td valign="top" width="50%">
+<p>Click "Open" to create a connection to the server, 
+"Send" to send a message to the server and "Close" to close the connection. 
+You can change the message and send multiple times.
+<p>
+<form>
+<label for="serverPort">Connection Info(PORT:ClientID):</label>
+<input type="text" id="serverPort" value="8081:1"><br>
+<button id="open">Open</button>
+<button id="close">Close</button>
+
+<p><input id="handshake-input" type="text" value="HANDSHAKE">
+<button id="handshake" type="button">Handshake</button>
+
+<p><input id="input" type="text" value="Hello world!">
+<button id="send">Send</button>
+</form>
+</td><td valign="top" width="50%">
+<div id="output" style="max-height: 70vh;overflow-y: scroll;"></div>
+</td></tr></table>
+</body>
+</html>

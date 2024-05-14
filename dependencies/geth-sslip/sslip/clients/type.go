@@ -5,15 +5,17 @@ import (
 )
 
 type Client struct {
-	ID      string
-	Conn    *websocket.Conn
-	PubKeyB []byte
+	ID        string
+	Conn      *websocket.Conn
+	PubKeyB   []byte
+	ChannelID string
 }
 
 func New(id string, conn *websocket.Conn) *Client {
 	return &Client{
-		ID:      id,
-		Conn:    conn,
-		PubKeyB: []byte{},
+		ID:        id,
+		Conn:      conn,
+		PubKeyB:   []byte{},
+		ChannelID: "",
 	}
 }

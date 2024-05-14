@@ -11,10 +11,11 @@ import (
 )
 
 type Manager struct {
-	clientsMap map[string]*mClient.Client
-	mu         sync.Mutex
-	PrivateKey *ecdsa.PrivateKey
-	PublicKey  *ecdsa.PublicKey
+	clientsMap      map[string]*mClient.Client
+	mu              sync.Mutex
+	PrivateKey      *ecdsa.PrivateKey
+	PublicKey       *ecdsa.PublicKey
+	ContractAddress string
 }
 
 type ClientManager interface {
@@ -22,6 +23,7 @@ type ClientManager interface {
 	RemoveClient(id string)
 	GetClient(id string) *mClient.Client
 	SetClientPubK(id string, pubK []byte)
+	SetClientChannel(id string, channelID string)
 	PrintClientsMap()
 }
 
@@ -31,8 +33,9 @@ func NewManager() *Manager {
 	publicKeyECDSA, _ := publicKey.(*ecdsa.PublicKey)
 
 	return &Manager{
-		clientsMap: make(map[string]*mClient.Client),
-		PrivateKey: privateKeyECDSA,
-		PublicKey:  publicKeyECDSA,
+		clientsMap:      make(map[string]*mClient.Client),
+		PrivateKey:      privateKeyECDSA,
+		PublicKey:       publicKeyECDSA,
+		ContractAddress: "",
 	}
 }

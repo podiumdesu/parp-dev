@@ -28,6 +28,20 @@ func (m *Manager) SetClientPubKB(id string, pubKB []byte) {
 	m.clientsMap[id].PubKeyB = pubKB
 }
 
+func (m *Manager) SetClientChannelID(id string, channelID string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.clientsMap[id].ChannelID = channelID
+}
+func (m *Manager) SetContractAddress(contractAddress string) {
+	m.ContractAddress = contractAddress
+}
+
+func (m *Manager) GetClientChannelID(id string) string {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.clientsMap[id].ChannelID
+}
 func (m *Manager) GetClient(id string) *mClient.Client {
 	m.mu.Lock()
 	defer m.mu.Unlock()

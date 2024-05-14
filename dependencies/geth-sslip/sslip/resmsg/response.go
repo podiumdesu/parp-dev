@@ -8,9 +8,9 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-// type ServerMsg interface {
-// 	MessageType() string
-// }
+//	type ServerMsg interface {
+//		MessageType() string
+//	}
 
 type ServerMsg struct {
 	Type string `json:"type"`
@@ -99,6 +99,49 @@ func (r *ResponseMsg) BodyHashBytes() []byte {
 		TxIdx:         r.TxIdx,
 	}
 	jsonBody, _ := json.Marshal(data)
+	hash := crypto.Keccak256Hash(jsonBody)
+	return hash.Bytes()
+}
+
+// for storage proof
+type ResponseSPBody struct {
+	SignedReqBody []byte
+	Proof         [][]byte
+	Address       common.Address
+	BlockNr       *big.Int
+}
+type ResponseSPMsg struct {
+	Type               string
+	ChannelId          common.Hash
+	Amount             uint
+	SignedReqBody      []byte
+	CurrentBlockHeight *big.Int
+	ReturnValue        []byte
+	Proof              [][]byte
+	Address            common.Address
+	BlockNr            *big.Int
+	Signature          []byte
+}
+
+func (r *ResponseSPMsg) Bytes() []byte {
+	jsonMsg, _ := json.Marshal(r)
+	return jsonMsg
+}
+
+func (r *ResponseSPMsg) BodyHashBytes() []byte {
+	data := ResponseSPBody{
+		SignedReqBody: r.SignedReqBody,
+		Proof:         r.Proof,
+		Address:       r.Address,
+		BlockNr:       r.BlockNr,
+	}
+	jsonBody, _ := json.Marshal(data)
+	hash := crypto.Keccak256Hash(jsonBody)
+	return hash.Bytes()
+}
+
+func (r *ResponseSPBody) HashBytes() []byte {
+	jsonBody, _ := json.Marshal(r)
 	hash := crypto.Keccak256Hash(jsonBody)
 	return hash.Bytes()
 }
