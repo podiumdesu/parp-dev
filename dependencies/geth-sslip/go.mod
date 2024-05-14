@@ -8,7 +8,7 @@ replace github.com/ethereum/go-ethereum/sslip/handlers => ./sslip/handlers
 
 replace github.com/ethereum/go-ethereum/sslip/clients => ./sslip/clients
 
-replace github.com/ethereum/go-ethereum/poc-client v0.0.1 => ../../go-learning/poc-client
+replace github.com/ethereum/go-ethereum/poc-client v0.0.1 => ../../poc/poc-client
 
 // replace github.com/ethereum/go-ethereum/poc-client/msg/request v0.0.1 => /Users/weihong/github/go-learning/poc-client/msg/request
 // replace github.com/ethereum/go-ethereum/poc-client/msg/handshake v0.0.1 => /Users/weihong/github/go-learning/poc-client/msg/handshake
