@@ -9,9 +9,11 @@ fi
 # Number of instances to run
 num_instances=$1
 
+GO_CMD=$(which go)
+
 for i in $(seq 1 $num_instances); do
   # Run each instance in the background
-  go run main.go &
+  $GO_CMD run main.go &
 done
 
 # Wait for all background processes to finish
