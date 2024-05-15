@@ -58,3 +58,4 @@ func GenerateRequest(c *client.Client, ch int, amount uint, reqByte []byte, bloc
 	// log.Println("Verification: ", cryptoutil.Verify(c.PubKeyBytes(), requestBody.HashByte(), signedReqBody))
 	return jsonRequest
 }
+
