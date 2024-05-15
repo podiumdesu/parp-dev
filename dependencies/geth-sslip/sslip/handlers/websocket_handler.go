@@ -29,9 +29,11 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{} // use default options
-
-const wsEndpointPort = 8100
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+} // use default options
 
 // type FullMemDB struct {
 // 	*memorydb.Database
@@ -68,11 +70,11 @@ const wsEndpointPort = 8100
 
 func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var upgrader = websocket.Upgrader{
-			CheckOrigin: func(r *http.Request) bool {
-				return true
-			},
-		}
+		// var upgrader = websocket.Upgrader{
+		// 	CheckOrigin: func(r *http.Request) bool {
+		// 		return true
+		// 	},
+		// }
 		conn, err := upgrader.Upgrade(w, r, nil)
 
 		if err != nil {
@@ -92,8 +94,10 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 
 		m.PrintClientsMap()
 
+		client := m.GetClient(clientID)
+
 		for {
-			mt, msg, err := conn.ReadMessage()
+			_, msg, err := conn.ReadMessage()
 			if err != nil {
 				if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
 					log.Printf("Client %s disconnected", clientID)
@@ -130,14 +134,14 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 
 				m.SetClientPubKB(clientID, hsMsg.Body.PubKB)
 				m.SetContractAddress(hsMsg.Body.ContractAddress)
-				log.Println("pubk has been set: ", m.GetClient(clientID).PubKeyB)
+				log.Println("pubk has been set: ", client.PubKeyB)
 
 				go func() {
 					handshakeMsg := resmsg.HandshakeMsg{
 						Type:             "HANDSHAKE-CONFIRMED",
 						ServerPublicKeyB: m.PubKeyBytes(),
 					}
-					conn.WriteMessage(mt, handshakeMsg.Bytes())
+					client.Send(handshakeMsg.Bytes())
 				}()
 				fmt.Println("------------------------------------------------------\n")
 				// log.Println("---------Connection with clientID ", clientID, " established---------")
@@ -190,7 +194,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 						Info: []byte("WRONG signature"),
 					}
 				}
-				conn.WriteMessage(mt, msg.Bytes())
+				client.Send(msg.Bytes())
 				fmt.Println("------------------------------------------------------\n")
 
 			case "TX":
@@ -223,10 +227,10 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 						Info: []byte("SigCheck: WRONG signature"),
 					}
 				}
-				conn.WriteMessage(mt, msg.Bytes())
+				client.Send(msg.Bytes())
 
 				wsEndpoint := "ws://localhost:8100"
-				client, err := ethclient.Dial(wsEndpoint)
+				bcClient, err := ethclient.Dial(wsEndpoint)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -236,7 +240,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 				txSend := new(types.Transaction)
 				rlp.DecodeBytes(requestByte, &txSend)
 
-				err = client.SendTransaction(context.Background(), txSend)
+				err = bcClient.SendTransaction(context.Background(), txSend)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -246,12 +250,12 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 					Type: "info-hex",
 					Info: txSend.Hash().Bytes(),
 				}
-				conn.WriteMessage(mt, msg.Bytes())
+				client.Send(msg.Bytes())
 
 				var txReceipt *types.Receipt
 				for txReceipt == nil {
 					// Query the transaction receipt
-					txReceipt, err = client.TransactionReceipt(context.Background(), txSend.Hash())
+					txReceipt, err = bcClient.TransactionReceipt(context.Background(), txSend.Hash())
 					if err != nil {
 						log.Println("Waiting for transaction to be mined...")
 						time.Sleep(5 * time.Second) // Adjust the sleep duration based on expected block time
@@ -292,14 +296,14 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 								Type: "info-hex",
 								Info: channelId.Bytes(),
 							}
-							conn.WriteMessage(mt, msg.Bytes())
+							client.Send(msg.Bytes())
 						}
 					}
 				}
 
 				// Generate the proof of the transaction
 				blockHash := txReceipt.BlockHash
-				block, _ := client.BlockByHash(context.Background(), blockHash)
+				block, _ := bcClient.BlockByHash(context.Background(), blockHash)
 				blockNr := block.Number()
 				txHash := txReceipt.TxHash
 				txIndex := txReceipt.TransactionIndex
@@ -351,7 +355,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 				}
 
 				log.Println(responseMsg)
-				_ = conn.WriteMessage(mt, responseMsg.Bytes())
+				client.Send(responseMsg.Bytes())
 
 				fmt.Println("------------------------------------------------------\n")
 
@@ -382,7 +386,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 						Info: []byte("SigCheck: WRONG signature"),
 					}
 				}
-				conn.WriteMessage(mt, msg.Bytes())
+				client.Send(msg.Bytes())
 
 				wsEndpoint := "ws://localhost:8100"
 				wsClient, err := ethclient.Dial(wsEndpoint)
@@ -446,7 +450,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 				}
 
 				log.Println(responseSPMsg)
-				_ = conn.WriteMessage(mt, responseSPMsg.Bytes())
+				client.Send(responseSPMsg.Bytes())
 
 				fmt.Println("------------------------------------------------------\n")
 
@@ -471,7 +475,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 					Type: "info",
 					Info: []byte("server:" + string(msg)),
 				}
-				err = conn.WriteMessage(mt, serverMsg.Bytes())
+				client.Send(serverMsg.Bytes())
 				if err != nil {
 					log.Println("Write: ", err)
 					break
@@ -573,14 +577,14 @@ func generateProof(block *types.Block, txHash common.Hash) (mpt.Proof, int) {
 
 func verifyProof(txHash common.Hash, proof mpt.Proof, blockNr *big.Int, idx uint32) bool {
 	wsEndpoint := "ws://localhost:8100"
-	client, err := ethclient.Dial(wsEndpoint)
+	bcClient, err := ethclient.Dial(wsEndpoint)
 	if err != nil {
 		log.Fatal(err)
 	}
 	// query the block information
-	block, _ := client.HeaderByNumber(context.Background(), blockNr)
+	block, _ := bcClient.HeaderByNumber(context.Background(), blockNr)
 	txRootHash := block.TxHash
-	tx, _, _ := client.TransactionByHash(context.Background(), txHash)
+	tx, _, _ := bcClient.TransactionByHash(context.Background(), txHash)
 	txRLP, _ := rlp.EncodeToBytes(tx)
 	key, _ := rlp.EncodeToBytes(uint32(idx))
 	txProofRLP, _ := mpt.VerifyProof(txRootHash[:], key, proof)

@@ -20,7 +20,7 @@ import (
 
 func OpenChanTx(c *pocClient.Client, fnAddr common.Address, deposit *big.Int, contractAddress common.Address) []byte {
 	// Setup Account
-	wsEndpoint := "ws://localhost:8100"
+	wsEndpoint := c.BcWsEndpoint
 	client, err := ethclient.Dial(wsEndpoint)
 	if err != nil {
 		log.Fatal(err)
