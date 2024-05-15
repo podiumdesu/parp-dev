@@ -52,9 +52,9 @@ $PRYSM_BEACON_BINARY \
     --chain-config-file=$NODE_DIR/consensus/config.yml \
     --contract-deployment-block=0 \
     --chain-id=${CHAIN_ID:-32382} \
-    --rpc-host=127.0.0.1 \
+    --rpc-host=0.0.0.0 \
     --rpc-port=$((PRYSM_BEACON_RPC_PORT + i)) \
-    --grpc-gateway-host=127.0.0.1 \
+    --grpc-gateway-host=0.0.0.0\
     --grpc-gateway-port=$((PRYSM_BEACON_GRPC_GATEWAY_PORT + i)) \
     --execution-endpoint=http://localhost:$((GETH_AUTH_RPC_PORT + i)) \
     --accept-terms-of-use \

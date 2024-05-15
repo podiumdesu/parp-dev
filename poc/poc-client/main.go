@@ -12,18 +12,22 @@ import (
 	"poc-server/mpt"
 	"poc-server/resmsg"
 	"sync"
+	"time"
 
 	"poc-client/client"
 	"poc-client/connection"
 	"poc-client/hub"
+	// "poc-client/benchmarking"
 	"poc-client/hub/wsClient"
 	"poc-client/msg/request"
 	"poc-client/protocol"
 	"poc-client/utils/cryptoutil"
-
+	// "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	// "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
+	// "github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -36,6 +40,8 @@ type Config struct {
 	ServerEndpoint     string `json:"serverEndpoint"`
 	ContractAddress    string `json:"contractAddress"`
 }
+
+var startTime time.Time
 
 func main() {
 	// The hub is responsible for managing all the websocket connections
@@ -100,18 +106,24 @@ func main() {
 			case "SigCheck":
 				log.Println(msg)
 			case "response":
-				log.Println(string(msg))
+				durationRes := time.Since(startTime)
+				verifyTimer := time.Now()
+				log.Printf("Duration for transaction: %s\n", durationRes)
+
+				// log.Println(string(msg))
 				var resMsg resmsg.ResponseMsg
 
+
+				// log.Println("Size of the Tx response: %d bytes", len(msg))
 				err := json.Unmarshal(msg, &resMsg)
 				if err != nil {
 					log.Println("Unmarshal error: ", err)
 					break
 				}
-
+				// log.Println("size of proof for transactions: ", len(resMsg.Proof))
 				resMsgBodyHash := resMsg.BodyHashBytes()
 				res := cryptoutil.Verify(crypto.FromECDSAPub(client.ServerPublicKey), resMsgBodyHash, resMsg.Signature)
-				log.Println("Verify Response signature:", res)
+				// log.Println("Verify Response signature:", res)
 
 				proof, err := mpt.DeserializeProof(resMsg.Proof)
 				if err != nil {
@@ -119,17 +131,28 @@ func main() {
 				}
 				res = verifyProof(client, resMsg.TxHash, proof, resMsg.CurrentBlockHeight, uint32(resMsg.TxIdx))
 
+				durationVeriTotal := time.Since(startTime)
+				durationVeri := time.Since(verifyTimer)
+				if res {
+					log.Printf("Duration for transaction: %s\n", durationVeriTotal)
+					log.Printf("Duration for transaction verification: %s\n", durationVeri)
+				}
+	
 				log.Println("Proof Verification: ", res)
 			case "responseSP":
 				log.Println(string(msg))
 				var resMsg resmsg.ResponseSPMsg
 				err := json.Unmarshal(msg, &resMsg)
+
+				log.Println("Size of the Request response: %d bytes", len(msg))
+
 				if err != nil {
 					log.Println("Unmarshal error: ", err)
 					break
 				}
 				res := cryptoutil.Verify(crypto.FromECDSAPub(client.ServerPublicKey), resMsg.BodyHashBytes(), resMsg.Signature)
 				log.Println("Verify Response signature:", res)
+
 				proof, err := mpt.DeserializeProof(resMsg.Proof)
 				if err != nil {
 					log.Println("Error deserializing proof: ", err)
@@ -155,6 +178,9 @@ func main() {
 
 		// b := []byte("HANDSHAKE:" + string(client.PubKeyBytes()))
 		log.Println("Sending: ", b)
+
+		startTime = time.Now()
+
 		hub.Send_fn <- b //[]byte("SIG:qwerrtqreqwrqwerqwrwerqwrewqtqwetqwrewqrqwerwqewqrqwer")
 		fmt.Println("----------------------------------------------\n")
 		hub.Send_fn <- []byte("FE: Connected to server")
@@ -173,51 +199,30 @@ func main() {
 		}
 		fmt.Println("------------------------------------------------------\n")
 
-		for i := 0; i < 1; i++ {
-			log.Println("\n------------------Send BalanceChecking request--------------------")
-			balanceCheckingReq := sendRequests(client, client.Amount+20)
-			select {
-			case hub.Send_fn <- balanceCheckingReq:
-				log.Println("Request message sent successfully")
-			default:
-				log.Println("Failed to send request message: channel is full or closed")
-			}
-			fmt.Println("------------------------------------------------------\n")
-		}
+
+		// Benchmarking for Geth nodes
+		// log.Println("\n------------------Send OpenChan Tx request to geth--------------------")
+		// benchmarking.GethSyncTx(client, common.HexToAddress(config.ContractAddress))
+		// fmt.Println("------------------------------------------------------\n")
+
+		// log.Println("\n------------------Send OpenChan Tx request to geth async--------------------")
+		// benchmarking.GethAsyncTx(client, common.HexToAddress(config.ContractAddress))
+		// fmt.Println("------------------------------------------------------\n")
+
+		// for i := 0; i < 1; i++ {
+		// 	log.Println("\n------------------Send BalanceChecking request--------------------")
+		// 	balanceCheckingReq := sendRequests(client, client.Amount+20)
+		// 	select {
+		// 	case hub.Send_fn <- balanceCheckingReq:
+		// 		log.Println("Request message sent successfully")
+		// 	default:
+		// 		log.Println("Failed to send request message: channel is full or closed")
+		// 	}
+		// 	fmt.Println("------------------------------------------------------\n")
+
+		// }
 
 	}()
-
-	// // Setup webpage for front end
-	// http.HandleFunc("/", web.HomeHandler)
-
-	// // Resolve websocket connection from the front end
-	// http.HandleFunc("/ws-client-fb-connect", connection.ConnectToFE(hub))
-
-	// // Send connection request from the front end to the server
-
-	// go func() {
-	// 	log.Println("Client server is running on port 8081")
-	// 	log.Fatal(http.ListenAndServe(":8081", nil))
-	// }()
-
-	// // http.HandleFunc("/start-handshaking", connection.Handshaking(hub))
-
-	// // Stop using front-end, just let the server generates the necessary data
-	// time.Sleep(2 * time.Second)
-
-	// go func() {
-	// 	// hub.Send_fn <- []byte("Reee:")
-	// 	// hub.Send_fn <- []byte("Send request:")
-
-	// 	i := protocol.GenerateRequest(client, 20, big.NewInt(333))
-	// 	log.Println("Request: ", string(i))
-	// 	b := append([]byte("SIG:"), i...)
-	// 	log.Println("Sending: ", string(b))
-	// 	// log.Println("Sending: ", string(b))
-	// 	// log.Println("Payload size: ", len(b))
-	// 	hub.Send_fn <- b
-	// 	// hub.Send_fn <- []byte("FFFFFF:")
-	// }()
 
 	select {}
 
@@ -272,8 +277,8 @@ func sendOpenChanTxs(client *client.Client, contractAddress common.Address) []by
 	log.Println("Sending: ", string(msgWType))
 
 	return msgWType
-
 }
+
 func loadConfig(filename string) (*Config, error) {
 	// Read configuration file
 	data, err := ioutil.ReadFile(filename)
