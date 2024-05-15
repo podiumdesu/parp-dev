@@ -1,1 +1,6 @@
 package benchmarking
+
+
+func Greeting() {
+	
+}

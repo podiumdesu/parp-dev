@@ -19,7 +19,6 @@ import (
 	"poc-client/connection"
 	"poc-client/hub"
 
-	// "poc-client/benchmarking"
 	"poc-client/hub/wsClient"
 	"poc-client/msg/request"
 	"poc-client/protocol"
@@ -200,6 +199,7 @@ func main() {
 	wg.Wait()
 
 	go func() {
+		benchmarking.Greeting()
 		// log.Println("\n------------------Send OpenChan Tx request--------------------")
 		// OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress))
 		// startTime = time.Now()
