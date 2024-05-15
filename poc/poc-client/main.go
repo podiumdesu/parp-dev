@@ -14,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"poc-client/benchmarking"
 	"poc-client/client"
 	"poc-client/connection"
 	"poc-client/hub"
@@ -220,35 +221,39 @@ func main() {
 		// benchmarking.GethAsyncTx(client, common.HexToAddress(config.ContractAddress))
 		// fmt.Println("------------------------------------------------------\n")
 
-		for i := 0; i < 1; i++ {
-			log.Println("\n------------------Send BalanceChecking request--------------------")
-			balanceCheckingReq := sendRequests(client, client.Amount+20)
+		// for i := 0; i < 1; i++ {
+		// 	log.Println("\n------------------Send BalanceChecking request--------------------")
+		// 	balanceCheckingReq := sendRequests(client, client.Amount+20)
 
-			startTimeQuerySslip = time.Now()
-			select {
-			case hub.Send_fn <- balanceCheckingReq:
-				log.Println("Request message sent successfully")
-			default:
-				log.Println("Failed to send request message: channel is full or closed")
-			}
-			fmt.Println("------------------------------------------------------\n")
-			time.Sleep(100 * time.Millisecond) // Sleep for 100 milliseconds
-		}
+		// 	startTimeQuerySslip = time.Now()
+		// 	select {
+		// 	case hub.Send_fn <- balanceCheckingReq:
+		// 		log.Println("Request message sent successfully")
+		// 	default:
+		// 		log.Println("Failed to send request message: channel is full or closed")
+		// 	}
+		// 	fmt.Println("------------------------------------------------------\n")
+		// 	time.Sleep(100 * time.Millisecond) // Sleep for 100 milliseconds
+		// }
 
-		var totalDurationResponse time.Duration
-		var totalDurationVerification time.Duration
-		for _, d := range durationQueryTimes {
-			totalDurationResponse += d
-		}
-		for _, d := range durationQueryVerifyTimes {
-			totalDurationVerification += d
-		}
+		// var totalDurationResponse time.Duration
+		// var totalDurationVerification time.Duration
+		// for _, d := range durationQueryTimes {
+		// 	totalDurationResponse += d
+		// }
+		// for _, d := range durationQueryVerifyTimes {
+		// 	totalDurationVerification += d
+		// }
 
-		averageDurationResponse := totalDurationResponse / time.Duration(len(durationQueryTimes))
-		averageDurationVerify := totalDurationVerification / time.Duration(len(durationQueryVerifyTimes))
+		// averageDurationResponse := totalDurationResponse / time.Duration(len(durationQueryTimes))
+		// averageDurationVerify := totalDurationVerification / time.Duration(len(durationQueryVerifyTimes))
 
-		log.Printf("Average duration for %d requests: %s", len(durationQueryTimes), averageDurationResponse)
-		log.Printf("Average duration for %d requests got verified: %s", len(durationQueryVerifyTimes), averageDurationVerify)
+		// log.Printf("Average duration for %d requests: %s", len(durationQueryTimes), averageDurationResponse)
+		// log.Printf("Average duration for %d requests got verified: %s", len(durationQueryVerifyTimes), averageDurationVerify)
+
+		// Benchmarking: geth requests
+
+		benchmarking.GethSyncQuery()
 
 	}()
 
