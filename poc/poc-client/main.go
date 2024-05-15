@@ -17,14 +17,17 @@ import (
 	"poc-client/client"
 	"poc-client/connection"
 	"poc-client/hub"
+
 	// "poc-client/benchmarking"
 	"poc-client/hub/wsClient"
 	"poc-client/msg/request"
 	"poc-client/protocol"
 	"poc-client/utils/cryptoutil"
+
 	// "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+
 	// "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	// "github.com/ethereum/go-ethereum/common/hexutil"
@@ -42,6 +45,10 @@ type Config struct {
 }
 
 var startTime time.Time
+var startTimeQuerySslip time.Time
+var startTimeVerifySslip time.Time
+var durationQueryTimes []time.Duration
+var durationQueryVerifyTimes []time.Duration
 
 func main() {
 	// The hub is responsible for managing all the websocket connections
@@ -113,7 +120,6 @@ func main() {
 				// log.Println(string(msg))
 				var resMsg resmsg.ResponseMsg
 
-
 				// log.Println("Size of the Tx response: %d bytes", len(msg))
 				err := json.Unmarshal(msg, &resMsg)
 				if err != nil {
@@ -137,9 +143,12 @@ func main() {
 					log.Printf("Duration for transaction: %s\n", durationVeriTotal)
 					log.Printf("Duration for transaction verification: %s\n", durationVeri)
 				}
-	
+
 				log.Println("Proof Verification: ", res)
 			case "responseSP":
+				durationGetQueryBackSSLIP := time.Since(startTimeQuerySslip)
+				durationQueryTimes = append(durationQueryTimes, durationGetQueryBackSSLIP)
+				startTimeVerifySslip = time.Now()
 				log.Println(string(msg))
 				var resMsg resmsg.ResponseSPMsg
 				err := json.Unmarshal(msg, &resMsg)
@@ -159,7 +168,10 @@ func main() {
 				}
 				result, validState := verifySPProof(client, proof, resMsg.BlockNr, resMsg.Address)
 				log.Println(result, validState)
-
+				if result {
+					durationQueryVeriTime := time.Since(startTimeVerifySslip)
+					durationQueryVerifyTimes = append(durationQueryVerifyTimes, durationQueryVeriTime)
+				}
 			default:
 				log.Println("Unrecognized message type: ", serverMsg.Type)
 			}
@@ -179,8 +191,6 @@ func main() {
 		// b := []byte("HANDSHAKE:" + string(client.PubKeyBytes()))
 		log.Println("Sending: ", b)
 
-		startTime = time.Now()
-
 		hub.Send_fn <- b //[]byte("SIG:qwerrtqreqwrqwerqwrwerqwrewqtqwetqwrewqrqwerwqewqrqwer")
 		fmt.Println("----------------------------------------------\n")
 		hub.Send_fn <- []byte("FE: Connected to server")
@@ -189,16 +199,17 @@ func main() {
 	wg.Wait()
 
 	go func() {
-		log.Println("\n------------------Send OpenChan Tx request--------------------")
-		OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress))
-		select {
-		case hub.Send_fn <- OpenChanTx:
-			log.Println("Request message sent successfully")
-		default:
-			log.Println("Failed to send request message: channel is full or closed")
-		}
-		fmt.Println("------------------------------------------------------\n")
+		// log.Println("\n------------------Send OpenChan Tx request--------------------")
+		// OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress))
+		// startTime = time.Now()
 
+		// select {
+		// case hub.Send_fn <- OpenChanTx:
+		// 	log.Println("Request message sent successfully")
+		// default:
+		// 	log.Println("Failed to send request message: channel is full or closed")
+		// }
+		// fmt.Println("------------------------------------------------------\n")
 
 		// Benchmarking for Geth nodes
 		// log.Println("\n------------------Send OpenChan Tx request to geth--------------------")
@@ -209,18 +220,35 @@ func main() {
 		// benchmarking.GethAsyncTx(client, common.HexToAddress(config.ContractAddress))
 		// fmt.Println("------------------------------------------------------\n")
 
-		// for i := 0; i < 1; i++ {
-		// 	log.Println("\n------------------Send BalanceChecking request--------------------")
-		// 	balanceCheckingReq := sendRequests(client, client.Amount+20)
-		// 	select {
-		// 	case hub.Send_fn <- balanceCheckingReq:
-		// 		log.Println("Request message sent successfully")
-		// 	default:
-		// 		log.Println("Failed to send request message: channel is full or closed")
-		// 	}
-		// 	fmt.Println("------------------------------------------------------\n")
+		for i := 0; i < 1; i++ {
+			log.Println("\n------------------Send BalanceChecking request--------------------")
+			balanceCheckingReq := sendRequests(client, client.Amount+20)
 
-		// }
+			startTimeQuerySslip = time.Now()
+			select {
+			case hub.Send_fn <- balanceCheckingReq:
+				log.Println("Request message sent successfully")
+			default:
+				log.Println("Failed to send request message: channel is full or closed")
+			}
+			fmt.Println("------------------------------------------------------\n")
+			time.Sleep(100 * time.Millisecond) // Sleep for 100 milliseconds
+		}
+
+		var totalDurationResponse time.Duration
+		var totalDurationVerification time.Duration
+		for _, d := range durationQueryTimes {
+			totalDurationResponse += d
+		}
+		for _, d := range durationQueryVerifyTimes {
+			totalDurationVerification += d
+		}
+
+		averageDurationResponse := totalDurationResponse / time.Duration(len(durationQueryTimes))
+		averageDurationVerify := totalDurationVerification / time.Duration(len(durationQueryVerifyTimes))
+
+		log.Printf("Average duration for %d requests: %s", len(durationQueryTimes), averageDurationResponse)
+		log.Printf("Average duration for %d requests got verified: %s", len(durationQueryVerifyTimes), averageDurationVerify)
 
 	}()
 
