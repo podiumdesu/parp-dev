@@ -12,12 +12,12 @@ import (
 	"poc-server/mpt"
 	"poc-server/resmsg"
 	"sync"
-	// "time"
+	"time"
 
 	"poc-client/client"
 	"poc-client/connection"
 	"poc-client/hub"
-	"poc-client/benchmarking"
+	// "poc-client/benchmarking"
 	"poc-client/hub/wsClient"
 	"poc-client/msg/request"
 	"poc-client/protocol"
@@ -40,6 +40,8 @@ type Config struct {
 	ServerEndpoint     string `json:"serverEndpoint"`
 	ContractAddress    string `json:"contractAddress"`
 }
+
+var startTime time.Time
 
 func main() {
 	// The hub is responsible for managing all the websocket connections
@@ -104,20 +106,24 @@ func main() {
 			case "SigCheck":
 				log.Println(msg)
 			case "response":
-				log.Println(string(msg))
+				durationRes := time.Since(startTime)
+				verifyTimer := time.Now()
+				log.Printf("Duration for transaction: %s\n", durationRes)
+
+				// log.Println(string(msg))
 				var resMsg resmsg.ResponseMsg
 
 
-				log.Println("Size of the Tx response: %d bytes", len(msg))
+				// log.Println("Size of the Tx response: %d bytes", len(msg))
 				err := json.Unmarshal(msg, &resMsg)
 				if err != nil {
 					log.Println("Unmarshal error: ", err)
 					break
 				}
-				log.Println("size of proof for transactions: ", len(resMsg.Proof))
+				// log.Println("size of proof for transactions: ", len(resMsg.Proof))
 				resMsgBodyHash := resMsg.BodyHashBytes()
 				res := cryptoutil.Verify(crypto.FromECDSAPub(client.ServerPublicKey), resMsgBodyHash, resMsg.Signature)
-				log.Println("Verify Response signature:", res)
+				// log.Println("Verify Response signature:", res)
 
 				proof, err := mpt.DeserializeProof(resMsg.Proof)
 				if err != nil {
@@ -125,6 +131,13 @@ func main() {
 				}
 				res = verifyProof(client, resMsg.TxHash, proof, resMsg.CurrentBlockHeight, uint32(resMsg.TxIdx))
 
+				durationVeriTotal := time.Since(startTime)
+				durationVeri := time.Since(verifyTimer)
+				if res {
+					log.Printf("Duration for transaction: %s\n", durationVeriTotal)
+					log.Printf("Duration for transaction verification: %s\n", durationVeri)
+				}
+	
 				log.Println("Proof Verification: ", res)
 			case "responseSP":
 				log.Println(string(msg))
@@ -165,6 +178,9 @@ func main() {
 
 		// b := []byte("HANDSHAKE:" + string(client.PubKeyBytes()))
 		log.Println("Sending: ", b)
+
+		startTime = time.Now()
+
 		hub.Send_fn <- b //[]byte("SIG:qwerrtqreqwrqwerqwrwerqwrewqtqwetqwrewqrqwerwqewqrqwer")
 		fmt.Println("----------------------------------------------\n")
 		hub.Send_fn <- []byte("FE: Connected to server")
@@ -173,25 +189,25 @@ func main() {
 	wg.Wait()
 
 	go func() {
-		// log.Println("\n------------------Send OpenChan Tx request--------------------")
-		// OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress))
-		// select {
-		// case hub.Send_fn <- OpenChanTx:
-		// 	log.Println("Request message sent successfully")
-		// default:
-		// 	log.Println("Failed to send request message: channel is full or closed")
-		// }
-		// fmt.Println("------------------------------------------------------\n")
+		log.Println("\n------------------Send OpenChan Tx request--------------------")
+		OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress))
+		select {
+		case hub.Send_fn <- OpenChanTx:
+			log.Println("Request message sent successfully")
+		default:
+			log.Println("Failed to send request message: channel is full or closed")
+		}
+		fmt.Println("------------------------------------------------------\n")
 
 
 		// Benchmarking for Geth nodes
-		log.Println("\n------------------Send OpenChan Tx request to geth--------------------")
-		benchmarking.GethSyncTx(client, common.HexToAddress(config.ContractAddress))
-		fmt.Println("------------------------------------------------------\n")
+		// log.Println("\n------------------Send OpenChan Tx request to geth--------------------")
+		// benchmarking.GethSyncTx(client, common.HexToAddress(config.ContractAddress))
+		// fmt.Println("------------------------------------------------------\n")
 
-		log.Println("\n------------------Send OpenChan Tx request to geth async--------------------")
-		benchmarking.GethAsyncTx(client, common.HexToAddress(config.ContractAddress))
-		fmt.Println("------------------------------------------------------\n")
+		// log.Println("\n------------------Send OpenChan Tx request to geth async--------------------")
+		// benchmarking.GethAsyncTx(client, common.HexToAddress(config.ContractAddress))
+		// fmt.Println("------------------------------------------------------\n")
 
 		// for i := 0; i < 1; i++ {
 		// 	log.Println("\n------------------Send BalanceChecking request--------------------")
