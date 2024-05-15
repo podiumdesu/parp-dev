@@ -8,25 +8,22 @@ import (
 	"poc-client/client"
 	"time"
 
-	"poc-server/msg/request"
+	"poc-client/msg/request"
 
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
 var durationTotal time.Duration
 
-func GethSyncQuery() {
+func GethSyncQuery(client *client.Client) {
 	totalNum := 100
 	// Benchmarking: sslip requests
 	wsEndpoint := client.BcWsEndpoint
-	bcClient, err := ethclient.Dial(wsEndpoint)
 	rpcClient, err := rpc.Dial(wsEndpoint)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	blockHeader, _ := bcClient.HeaderByNumber(context.Background(), nil)
 
 	request := request.JSONRPCRequest{
 		JSONRPC: "2.0",
