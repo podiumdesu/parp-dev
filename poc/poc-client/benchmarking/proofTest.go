@@ -65,7 +65,7 @@ func ProofGenerationAndVerification(client *client.Client) {
 		totalTxResponseGenerationTime += duration
 	}
 
-	log.Println("Average Tx response generation time: ", totalTxResponseGenerationTime/time.Duration(numRequests))
+	log.Println("Average Tx response rest generation time: ", totalTxResponseGenerationTime/time.Duration(numRequests))
 }
 
 func generateTxRequest() {
