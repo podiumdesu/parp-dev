@@ -20,7 +20,7 @@ import (
 
 func GethAsyncTx(client *client.Client, contractAddress common.Address) {
 
-	totalNum := 400
+	totalNum := 200
 	var totalDuration time.Duration
 	var successNum int
 	var wg sync.WaitGroup

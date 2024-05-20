@@ -3,6 +3,7 @@ package benchmarking
 import (
 	"bytes"
 	"context"
+	"crypto/ecdsa"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -32,17 +33,18 @@ func ProofGenerationAndVerification(client *client.Client) {
 	wsEndpoint := client.BcWsEndpoint
 	bcClient, _ := ethclient.Dial(wsEndpoint)
 
-	numRequests := 5
+	numRequests := 100
 
 	// average time for generating a msg
 	msg := sendRequestAverage(client, numRequests)
+	return
 
 	// pick the block (with a lot of transactions)
 	// nr := 42 // 1
 	// nr := 47 // 10
-	nr := 49 // 50
+	// nr := 49 // 50
 	// nr := 46 / 100
-	// nr := 50 // 200
+	nr := 512 // 200
 	// nr := 52 //300
 	// nr := 54 //400
 
@@ -60,6 +62,10 @@ func ProofGenerationAndVerification(client *client.Client) {
 	for i := 0; i < numRequests; i++ {
 		ResponseAndRequestSize(client, msg, proofArray[i], txs[i].Hash(), uint32(i), blockNr)
 	}
+}
+
+func generateTxRequest() {
+
 }
 
 func ResponseAndRequestSize(client *client.Client, msg []byte, proof mpt.Proof, txHash common.Hash, idx uint32, blockNr *big.Int) {
@@ -234,9 +240,87 @@ func sendRequestAverage(client *client.Client, numRequests int) []byte {
 		totalDuration += duration
 	}
 
+	// Average time to verify the message
+
+	var sigVeriDuration time.Duration
+
+	clientPrivKey, _ := crypto.HexToECDSA("f39985d76a9bf831c3a3fe19cfbe7d038ad25b5de2ceffd4a1cf15191808b396")
+	publicKey := clientPrivKey.Public()
+	publicKeyECDSA, _ := publicKey.(*ecdsa.PublicKey)
+
+	for i := 0; i < numRequests; i++ {
+		veriTimer := time.Now()
+		parts := strings.SplitN(string(msg), ":", 2)
+		if len(parts) < 2 {
+			log.Println("Invalid message format")
+			return nil
+		}
+
+		header := parts[0]
+		body := parts[1]
+		switch header {
+		case "REQ":
+			var req request.RequestMsg
+			err := json.Unmarshal([]byte(body), &req)
+			if err != nil {
+				log.Fatal("Unmarshal error: ", err)
+				break
+			}
+			// jsonReq, _ := json.Marshal(req)
+
+			// requestByte := req.ReqByte
+
+			// serverPrivKey, _ := crypto.HexToECDSA("bcd5c542c981dbb7cee1f3352fcee082581b4a323bf5cbff105aa84fa718f690")
+
+			pubKey := crypto.FromECDSAPub(publicKeyECDSA)
+			// verify the signature
+			sigFlag := VerifyRequestWithSig(req, pubKey)
+			if sigFlag {
+				sigVeriDuration += time.Since(veriTimer)
+			}
+			log.Println(sigFlag)
+		}
+
+	}
+
 	averageDuration := totalDuration / time.Duration(numRequests)
 	fmt.Printf("Average request time: %s\n", averageDuration)
+
+	averageVeriDuration := sigVeriDuration / time.Duration(numRequests)
+	fmt.Printf("Average request verification time: %s\n", averageVeriDuration)
 	return msg
+}
+
+func VerifyRequestWithSig(req request.RequestMsg, pubKB []byte) bool {
+	// Have to verify both signatures
+
+	requestBody := request.ReqBody{
+		ChannelID:      req.ChannelID,
+		Amount:         req.Amount,
+		ReqByte:        req.ReqByte,
+		LocalBlockHash: req.LocalBlockHash,
+	}
+
+	paymentBody := request.PaymentBody{
+		ChannelID: req.ChannelID,
+		Amount:    req.Amount,
+	}
+
+	reqBSig := req.SignedReqBody
+	payBSig := req.SignedPaymentBody
+
+	if reqBSig[64] == 27 || reqBSig[64] == 28 {
+		reqBSig[64] -= 27
+	}
+
+	if payBSig[64] == 27 || payBSig[64] == 28 {
+		payBSig[64] -= 27
+	}
+
+	rbFlag := cryptoutil.Verify(pubKB, requestBody.PreHashByte(), req.SignedReqBody)
+	pbFlag := cryptoutil.Verify(pubKB, paymentBody.PreHashByte(), req.SignedPaymentBody)
+	log.Println("rbFlag: ", rbFlag, " pbFlag: ", pbFlag)
+	return rbFlag && pbFlag
 }
 
 func sendRequests(client *client.Client, amount uint) []byte {

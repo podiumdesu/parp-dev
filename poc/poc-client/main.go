@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"crypto/ecdsa"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -156,7 +155,6 @@ func main() {
 
 					resMsgBodyHash := resMsg.BodyHashBytes()
 					_ = cryptoutil.Verify(crypto.FromECDSAPub(client.ServerPublicKey), resMsgBodyHash, resMsg.Signature)
-
 					totalDuration := time.Since(verifyTimer)
 					restVeriDuration := totalDuration - proofDuration
 					if proofRes {
@@ -300,43 +298,43 @@ func main() {
 	go func() {
 		benchmarking.Greeting()
 
-		const requestNum = 5
-		wsEndpoint := client.BcWsEndpoint
-		bcClient, err := ethclient.Dial(wsEndpoint)
+		// const requestNum = 5
+		// wsEndpoint := client.BcWsEndpoint
+		// bcClient, err := ethclient.Dial(wsEndpoint)
 
-		privateKey := client.PrivateKey
+		// privateKey := client.PrivateKey
 
-		publicKey := privateKey.Public()
-		publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
-		if !ok {
-			log.Fatal("cannot assert type: publicKey is not of type *ecdsa.PublicKey")
-		}
-		fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+		// publicKey := privateKey.Public()
+		// publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+		// if !ok {
+		// 	log.Fatal("cannot assert type: publicKey is not of type *ecdsa.PublicKey")
+		// }
+		// fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
 
-		nonce, err := bcClient.PendingNonceAt(context.Background(), fromAddress)
-		if err != nil {
-			log.Fatal(err)
-		}
+		// nonce, err := bcClient.PendingNonceAt(context.Background(), fromAddress)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
 
-		var totalReqGenTime time.Duration
-		for i := 0; i < requestNum; i++ {
-			// go func(i int) {
-			requestGenTimer := time.Now()
-			OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress), nonce+uint64(i))
+		// var totalReqGenTime time.Duration
+		// for i := 0; i < requestNum; i++ {
+		// 	// go func(i int) {
+		// 	requestGenTimer := time.Now()
+		// 	OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress), nonce+uint64(i))
 
-			duration := time.Since(requestGenTimer)
-			totalReqGenTime += duration
-			select {
-			case hub.Send_fn <- OpenChanTx:
-				log.Printf("Request %d sent successfully\n", i)
-			default:
-				log.Printf("Failed to send request %d: channel is full or closed\n", i)
-			}
-			// }(i)
-		}
-		log.Println("Average request generation time: ", totalReqGenTime/time.Duration(requestNum))
+		// 	duration := time.Since(requestGenTimer)
+		// 	totalReqGenTime += duration
+		// 	select {
+		// 	case hub.Send_fn <- OpenChanTx:
+		// 		log.Printf("Request %d sent successfully\n", i)
+		// 	default:
+		// 		log.Printf("Failed to send request %d: channel is full or closed\n", i)
+		// 	}
+		// 	// }(i)
+		// }
+		// log.Println("Average request generation time: ", totalReqGenTime/time.Duration(requestNum))
 
-		log.Println("All requests have been sent")
+		// log.Println("All requests have been sent")
 
 		// // Benchmarking for Geth nodes
 		// log.Println("\n------------------Send OpenChan Tx request to geth--------------------")
@@ -400,7 +398,7 @@ func main() {
 	}()
 
 	go func() {
-		// benchmarking.ProofGenerationAndVerification(client)
+		benchmarking.ProofGenerationAndVerification(client)
 	}()
 	select {}
 
