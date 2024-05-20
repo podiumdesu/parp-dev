@@ -271,14 +271,23 @@ func sendRequestAverage(client *client.Client, numRequests int) []byte {
 			// requestByte := req.ReqByte
 
 			// serverPrivKey, _ := crypto.HexToECDSA("bcd5c542c981dbb7cee1f3352fcee082581b4a323bf5cbff105aa84fa718f690")
+			// placeholder for amount checks
+			var tmp bool
+			if req.Amount < 0 {
+				log.Println("Invalid amount")
+				tmp = false
+			}
+			tmp = true
 
+			//
 			pubKey := crypto.FromECDSAPub(publicKeyECDSA)
 			// verify the signature
 			sigFlag := VerifyRequestWithSig(req, pubKey)
-			if sigFlag {
+
+			res := sigFlag && tmp
+			if res {
 				sigVeriDuration += time.Since(veriTimer)
 			}
-			log.Println(sigFlag)
 		}
 
 	}
