@@ -1,7 +1,6 @@
 package protocol
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"log"
 	"poc-client/client"
@@ -30,10 +29,10 @@ func GenerateRequest(c *client.Client, ch int, amount uint, reqByte []byte, bloc
 
 	signedPayBody := c.Sign(paymentBody.PreHashByte())
 
-	log.Println("_--------")
-	log.Println(hex.EncodeToString(paymentBody.PreHashByte()))
-	log.Println(hex.EncodeToString(signedPayBody))
-	log.Println("_--------")
+	// log.Println("_--------")
+	// log.Println(hex.EncodeToString(paymentBody.PreHashByte()))
+	// log.Println(hex.EncodeToString(signedPayBody))
+	// log.Println("_--------")
 	request := request.RequestMsg{
 		ChannelID:         ch,
 		Type:              0,
