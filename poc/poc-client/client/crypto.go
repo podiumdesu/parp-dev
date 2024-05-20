@@ -2,7 +2,6 @@ package client
 
 import (
 	"crypto/ecdsa"
-	"encoding/hex"
 	"log"
 
 	"github.com/ethereum/go-ethereum/crypto"
@@ -35,9 +34,9 @@ func SignEthereumMessage(data []byte, privateKey *ecdsa.PrivateKey) ([]byte, err
 		signature[64] += 27
 	}
 
-	log.Println("--------------")
-	log.Println(hex.EncodeToString(data))
-	log.Println(hex.EncodeToString(signature))
+	// log.Println("--------------")
+	// log.Println(hex.EncodeToString(data))
+	// log.Println(hex.EncodeToString(signature))
 
 	return signature, nil
 }

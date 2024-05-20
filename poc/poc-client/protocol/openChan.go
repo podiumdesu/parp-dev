@@ -3,12 +3,13 @@ package protocol
 import (
 	"context"
 	"crypto/ecdsa"
+
 	// "encoding/hex"
 	// "fmt"
 	"log"
 	"math/big"
-	pocClient "poc-client/client"
 	"math/rand"
+	pocClient "poc-client/client"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -87,7 +88,6 @@ func OpenChanTx(c *pocClient.Client, fnAddr common.Address, deposit *big.Int, co
 	return rawTxBytes
 }
 
-
 func OpenChanTxToGeth(c *pocClient.Client, fnAddr common.Address, deposit *big.Int, contractAddress common.Address, nonce uint64) *types.Transaction {
 	// Setup Account
 	wsEndpoint := c.BcWsEndpoint
@@ -134,10 +134,9 @@ func OpenChanTxToGeth(c *pocClient.Client, fnAddr common.Address, deposit *big.I
 		log.Fatalf("Failed to pack data for openChan: %v", err)
 	}
 
-
 	// Create transaction
 	tx := types.NewTransaction(nonce, contractAddress, deposit, gasLimit, gasPrice, data)
-	
+
 	chainID, err := client.NetworkID(context.Background())
 	if err != nil {
 		log.Fatal(err)

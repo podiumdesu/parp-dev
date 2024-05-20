@@ -13,7 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func GethSyncTx (client *client.Client, contractAddress common.Address) {
+func GethSyncTx(client *client.Client, contractAddress common.Address) {
 	var totalDuration time.Duration
 	totalNum := 10
 	var successNum int
@@ -21,7 +21,6 @@ func GethSyncTx (client *client.Client, contractAddress common.Address) {
 		fmt.Printf("Executing transaction %d...\n", i+1)
 		wsEndpoint := client.BcWsEndpoint
 		bcClient, err := ethclient.Dial(wsEndpoint)
-	
 
 		privateKey := client.PrivateKey
 
