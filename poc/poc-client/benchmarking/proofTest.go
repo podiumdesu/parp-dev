@@ -37,14 +37,14 @@ func ProofGenerationAndVerification(client *client.Client) {
 
 	// average time for generating a msg
 	msg := sendRequestAverage(client, numRequests)
-	return
+	// return
 
 	// pick the block (with a lot of transactions)
-	// nr := 42 // 1
-	// nr := 47 // 10
+	// nr := 2 // 1
+	// nr := 6 // 10
 	// nr := 49 // 50
-	// nr := 46 / 100
-	nr := 512 // 200
+	// nr := 8 / 100
+	nr := 10 // 200
 	// nr := 52 //300
 	// nr := 54 //400
 
@@ -53,31 +53,35 @@ func ProofGenerationAndVerification(client *client.Client) {
 	txs := block.Transactions()
 
 	// average time for generating a proof
-	proofArray := generateProofAverage(numRequests, client, blockNr)
+	proofArray := generateTxProofAverage(numRequests, client, blockNr)
 
 	// average time for verifying a proof
 	verifyProofAverage(numRequests, client, blockNr, proofArray)
 
+	var totalTxResponseGenerationTime time.Duration
 	// Request Size and Response size
 	for i := 0; i < numRequests; i++ {
-		ResponseAndRequestSize(client, msg, proofArray[i], txs[i].Hash(), uint32(i), blockNr)
+		duration := ResponseAndRequestSize(client, msg, proofArray[i], txs[i].Hash(), uint32(i), blockNr)
+		totalTxResponseGenerationTime += duration
 	}
+
+	log.Println("Average Tx response generation time: ", totalTxResponseGenerationTime/time.Duration(numRequests))
 }
 
 func generateTxRequest() {
 
 }
 
-func ResponseAndRequestSize(client *client.Client, msg []byte, proof mpt.Proof, txHash common.Hash, idx uint32, blockNr *big.Int) {
+func ResponseAndRequestSize(client *client.Client, msg []byte, proof mpt.Proof, txHash common.Hash, idx uint32, blockNr *big.Int) time.Duration {
 
 	log.Println("Size of Request: ", len(msg))
-	wsEndpoint := client.BcWsEndpoint
-	bcClient, _ := ethclient.Dial(wsEndpoint)
+	// wsEndpoint := client.BcWsEndpoint
+	// bcClient, _ := ethclient.Dial(wsEndpoint)
 
 	parts := strings.SplitN(string(msg), ":", 2)
 	if len(parts) < 2 {
 		log.Println("Invalid message format")
-		return
+		return time.Duration(0)
 	}
 
 	body := parts[1]
@@ -90,11 +94,12 @@ func ResponseAndRequestSize(client *client.Client, msg []byte, proof mpt.Proof, 
 	// requestByte := req.ReqByte
 	// log.Println("Size of Request: ", len(requestByte))
 
-	txReceipt, err := bcClient.TransactionReceipt(context.Background(), txHash)
+	// txReceipt, err := bcClient.TransactionReceipt(context.Background(), txHash)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	timer := time.Now()
 	channelId := common.HexToHash("0xae3bd68e96cf44fbda03d80e8745125d007c61ff72d2937ad2266e4c853a6b53")
 
 	responseBody := resmsg.ResponseBody{
@@ -119,12 +124,13 @@ func ResponseAndRequestSize(client *client.Client, msg []byte, proof mpt.Proof, 
 		Amount:             req.Amount,
 		SignedReqBody:      req.SignedReqBody,
 		CurrentBlockHeight: blockNr,
-		ReturnValue:        txReceipt.Bloom.Bytes(),
+		ReturnValue:        nil,
 		Proof:              proof.CustomSerialize(),
 		TxHash:             txHash,
 		TxIdx:              uint32(idx),
 		Signature:          sig,
 	}
+	duration := time.Since(timer)
 	log.Println("size of Response after json.Unmarshall: ", len(responseMsg.Bytes()))
 
 	v := reflect.ValueOf(responseMsg)
@@ -164,6 +170,7 @@ func ResponseAndRequestSize(client *client.Client, msg []byte, proof mpt.Proof, 
 		responseSize += length
 	}
 	log.Println("size of Response: ", responseSize)
+	return duration
 }
 
 func verifyProofAverage(numRequests int, client *client.Client, blockNr *big.Int, proofArray []mpt.Proof) {
@@ -184,14 +191,14 @@ func verifyProofAverage(numRequests int, client *client.Client, blockNr *big.Int
 		verifyProof(client, tx.Hash(), proofArray[i], blockNr, uint32(i))
 		duration := time.Since(start)
 		totalDuration += duration
-
 	}
 	averageDuration := totalDuration / time.Duration(numRequests)
 	fmt.Printf("Average proof verification time: %s\n", averageDuration)
 	// return msg
 }
 
-func generateProofAverage(numRequests int, c *client.Client, blockNr *big.Int) []mpt.Proof {
+func generateTxProofAverage(numRequests int, c *client.Client, blockNr *big.Int) []mpt.Proof {
+	log.Println("GenerateProofAverage")
 	wsEndpoint := c.BcWsEndpoint
 	bcClient, _ := ethclient.Dial(wsEndpoint)
 
@@ -205,7 +212,7 @@ func generateProofAverage(numRequests int, c *client.Client, blockNr *big.Int) [
 
 	var proofArray []mpt.Proof
 	for i := 0; i < numRequests; i++ {
-		log.Println("Generate Proof Average Transaction ", i)
+		// log.Println("Generate Proof Average Transaction ", i)
 		tx := txs[i]
 		start := time.Now()
 		proof, _ := generateProof(block, tx.Hash())
@@ -219,11 +226,11 @@ func generateProofAverage(numRequests int, c *client.Client, blockNr *big.Int) [
 		for _, sublist := range proof.CustomSerialize() {
 			ttLength += len(sublist)
 		}
-		log.Println("size of proof: ", ttLength)
+		// log.Println("size of proof: ", ttLength)
 	}
 
 	averageDuration := totalDuration / time.Duration(numRequests)
-	fmt.Printf("Average proof generation: %s\n", averageDuration)
+	fmt.Printf("Average proof generation time: %s\n", averageDuration)
 
 	return proofArray
 }
@@ -426,7 +433,7 @@ func verifyProof(client *client.Client, txHash common.Hash, proof mpt.Proof, blo
 	// log.Println("txRLP: ", txRLP)
 	// log.Println("proof: ", proof.Serialize())
 
-	log.Println(bytes.Equal(txRLP, txProofRLP))
+	// log.Println(bytes.Equal(txRLP, txProofRLP))
 	return bytes.Equal(txRLP, txProofRLP)
 }
 
