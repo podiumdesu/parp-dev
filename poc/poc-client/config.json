@@ -1,7 +1,7 @@
 {
     "privateKeyFilePath": "./poc-client.pem",
-    "bcWsEndpoint": "ws://172.22.29.197:8101",
-    "bcRpcEndpoint": "http://172.22.29.197:8001",
+    "bcWsEndpoint": "ws://172.22.29.197:8102",
+    "bcRpcEndpoint": "http://172.22.29.197:8002",
     "serverEndpoint": "ws://172.22.29.197:8888/ws/",
     "contractAddress": "0x094D6cd9dA692A4c490C1F8AD3E74D089E3492D6"
 }
