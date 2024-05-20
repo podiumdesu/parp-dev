@@ -19,7 +19,7 @@ import (
 
 func GethAsyncTx(client *client.Client, contractAddress common.Address) {
 
-	totalNum := 10
+	totalNum := 300
 	var totalDuration time.Duration
 	var successNum int
 	var wg sync.WaitGroup
@@ -51,7 +51,9 @@ func GethAsyncTx(client *client.Client, contractAddress common.Address) {
 		go func(txNum int) {
 			defer wg.Done()
 			fmt.Printf("Executing transaction %d...\n", txNum+1)
-			duration, err := sendOpenChanTxsToGeth(client, contractAddress, nonce+uint64(txNum))
+			log.Println(txNum)
+			// log.Println(nonce+uint64(txNum))
+			duration, err := sendOpenChanTxsToGeth(client, bcClient, contractAddress, nonce+uint64(txNum))
 			mu.Lock()
 			if duration != 0 {
 				successNum++
@@ -75,7 +77,7 @@ func GethAsyncTx(client *client.Client, contractAddress common.Address) {
 
 	for err := range errors {
 		if err != nil {
-			log.Println(err)
+			log.Println("err", err)
 		}
 	}
 
@@ -88,20 +90,15 @@ func GethAsyncTx(client *client.Client, contractAddress common.Address) {
 	}
 }
 
-func sendOpenChanTxsToGeth(client *client.Client, contractAddress common.Address, nonce uint64) (time.Duration, error) {
-	wsEndpoint := client.BcWsEndpoint
-	bcClient, err := ethclient.Dial(wsEndpoint)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+func sendOpenChanTxsToGeth(client *client.Client, bcClient *ethclient.Client, contractAddress common.Address, nonce uint64) (time.Duration, error) {
+	log.Println("CALLED")
 	fnAddr := common.HexToAddress("0xA2131E7503F7Dd11ff5dAAC09fa7c301e7Fe0f30")
 	deposit := big.NewInt(200000)
 	log.Println(nonce)
 	signedTx := protocol.OpenChanTxToGeth(client, fnAddr, deposit, contractAddress, nonce)
 
 	startTime := time.Now()
-	err = bcClient.SendTransaction(context.Background(), signedTx)
+	err := bcClient.SendTransaction(context.Background(), signedTx)
 	if err != nil {
 		log.Fatalf("Failed to send the transaction: %v", err)
 		return 0, err
