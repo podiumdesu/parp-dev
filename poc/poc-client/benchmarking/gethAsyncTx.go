@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	"sync"
-	"time"
 	"poc-client/client"
 	"poc-client/protocol"
+	"sync"
+	"time"
+
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -19,7 +20,11 @@ import (
 
 func GethAsyncTx(client *client.Client, contractAddress common.Address) {
 
+<<<<<<< HEAD
 	totalNum := 300
+=======
+	totalNum := 400
+>>>>>>> 2c759414002d851fc28e6fb6e2128aaa7093295a
 	var totalDuration time.Duration
 	var successNum int
 	var wg sync.WaitGroup
@@ -96,6 +101,12 @@ func sendOpenChanTxsToGeth(client *client.Client, bcClient *ethclient.Client, co
 	deposit := big.NewInt(200000)
 	log.Println(nonce)
 	signedTx := protocol.OpenChanTxToGeth(client, fnAddr, deposit, contractAddress, nonce)
+	// // calculate the tx Size
+	// signedTxBytes, err := signedTx.MarshalBinary()
+	// if err != nil {
+	// 	log.Fatalf("Failed to serialize the transaction: %v", err)
+	// }
+	// log.Println("Size of pure Tx: ", len(signedTxBytes))
 
 	startTime := time.Now()
 	err := bcClient.SendTransaction(context.Background(), signedTx)

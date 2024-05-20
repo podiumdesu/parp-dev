@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/ecdsa"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -26,6 +27,7 @@ import (
 
 	// "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 
 	// "github.com/ethereum/go-ethereum/core/types"
@@ -52,6 +54,15 @@ var durationQueryVerifyTimes []time.Duration
 var durationQueryProofVerifyTimes []time.Duration
 var durationQueryRestVerifyTimes []time.Duration
 
+type Result struct {
+	Success       bool
+	ProofDuration time.Duration
+	TotalDuration time.Duration
+}
+
+var results []Result        // This will hold the results from each response
+var resultsMutex sync.Mutex // Mutex to protect access to the results slice
+
 func main() {
 	// The hub is responsible for managing all the websocket connections
 	config, err := loadConfig("config.json")
@@ -74,6 +85,9 @@ func main() {
 
 	server := &wsClient.Client{Conn: server_wsConn, Send: make(chan []byte, 10000), Receive: make(chan []byte, 10000)}
 	hub.Set_fn <- server
+
+	// TOREMOVE: Benchmarking
+	// responses := make(chan resmsg.ResponseMsg, 1) // Buffer size can be adjusted
 
 	go server.WritePump()
 	go server.ReadPump()
@@ -115,20 +129,72 @@ func main() {
 			case "SigCheck":
 				log.Println(msg)
 			case "response":
-				durationRes := time.Since(startTime)
+				log.Println("response")
+				// benchmarking.HandleResponses(responses, client)
+				// log.Println(string(msg))
+				var bresMsg resmsg.ResponseMsg
+
+				// log.Println("Size of the Tx response: %d bytes", len(msg))
+				err := json.Unmarshal(msg, &bresMsg)
+				if err != nil {
+					log.Println("Unmarshal error: ", err)
+					break
+				}
+				wg.Add(1)
+				go func(resMsg resmsg.ResponseMsg) {
+					defer wg.Done()
+					verifyTimer := time.Now()
+
+					proof, err := mpt.DeserializeProof(resMsg.Proof)
+					if err != nil {
+						log.Printf("Error deserializing proof: %v\n", err)
+						return
+					}
+					proofTimer := time.Now()
+					proofRes := verifyProof(client, resMsg.TxHash, proof, resMsg.CurrentBlockHeight, uint32(resMsg.TxIdx))
+					proofDuration := time.Since(proofTimer)
+
+					resMsgBodyHash := resMsg.BodyHashBytes()
+					_ = cryptoutil.Verify(crypto.FromECDSAPub(client.ServerPublicKey), resMsgBodyHash, resMsg.Signature)
+
+					totalDuration := time.Since(verifyTimer)
+					restVeriDuration := totalDuration - proofDuration
+					if proofRes {
+						log.Printf("Duration for proof verification: %s\n", proofDuration)
+						log.Printf("Duration for the rest verification: %s\n", restVeriDuration)
+						log.Printf("Duration for request verification: %s\n", totalDuration)
+					}
+					// Protect the slice with a mutex
+					resultsMutex.Lock()
+					results = append(results, Result{
+						Success:       proofRes,
+						ProofDuration: proofDuration,
+						TotalDuration: restVeriDuration,
+					})
+					resultsMutex.Unlock()
+					log.Println(results)
+				}(bresMsg)
+				wg.Wait()
+
+				log.Println("Done")
+				calculateResults(results, resultsMutex)
+
+				break
+				// durationRes := time.Since(startTime)
 				verifyTimer := time.Now()
-				log.Printf("Duration for transaction: %s\n", durationRes)
+				// log.Printf("Duration for transaction: %s\n", durationRes)
 
 				// log.Println(string(msg))
 				var resMsg resmsg.ResponseMsg
 
 				// log.Println("Size of the Tx response: %d bytes", len(msg))
-				err := json.Unmarshal(msg, &resMsg)
+				err = json.Unmarshal(msg, &resMsg)
 				if err != nil {
 					log.Println("Unmarshal error: ", err)
 					break
 				}
 
+<<<<<<< HEAD
 				resMsgBodyHash := resMsg.BodyHashBytes()
 				res := cryptoutil.Verify(crypto.FromECDSAPub(client.ServerPublicKey), resMsgBodyHash, resMsg.Signature)
 				// log.Println("Verify Response signature:", res)
@@ -138,22 +204,33 @@ func main() {
 					ttLength += len(sublist)
 				}
 				log.Println("size of proof for transactions: ", ttLength)
+=======
+				proofTimer := time.Now()
+>>>>>>> 2c759414002d851fc28e6fb6e2128aaa7093295a
 				proof, err := mpt.DeserializeProof(resMsg.Proof)
 
 				// log.Println("size of deserializedProof: ", len(proof))
 				if err != nil {
 					log.Println("Error deserializing proof: ", err)
 				}
-				res = verifyProof(client, resMsg.TxHash, proof, resMsg.CurrentBlockHeight, uint32(resMsg.TxIdx))
+				proofRes := verifyProof(client, resMsg.TxHash, proof, resMsg.CurrentBlockHeight, uint32(resMsg.TxIdx))
+				durationProof := time.Since(proofTimer)
 
-				durationVeriTotal := time.Since(startTime)
+				// log.Println("size of proof for transactions: ", len(resMsg.Proof))
+				resMsgBodyHash := resMsg.BodyHashBytes()
+				_ = cryptoutil.Verify(crypto.FromECDSAPub(client.ServerPublicKey), resMsgBodyHash, resMsg.Signature)
+				// log.Println("Verify Response signature:", res)
+
 				durationVeri := time.Since(verifyTimer)
-				if res {
-					log.Printf("Duration for transaction: %s\n", durationVeriTotal)
-					log.Printf("Duration for transaction verification: %s\n", durationVeri)
+				durationVeriRest := durationVeri - durationProof
+
+				if proofRes {
+					log.Printf("Duration for proof verification: %s\n", durationProof)
+					log.Printf("Duration for the rest verification: %s\n", durationVeri)
+					log.Printf("Duration for request verification: %s\n", durationVeriRest)
 				}
 
-				log.Println("Proof Verification: ", res)
+				// return durationProof, durationVeri, durationVeriRest
 			case "responseSP":
 				durationGetQueryBackSSLIP := time.Since(startTimeQuerySslip)
 				durationQueryTimes = append(durationQueryTimes, durationGetQueryBackSSLIP)
@@ -215,20 +292,64 @@ func main() {
 
 	wg.Wait()
 
+	// go func() {
+	// 	log.Println("\n------------------Send OpenChan Tx request--------------------")
+	// 	OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress))
+	// 	// startTime = time.Now()
+
+	// 	select {
+	// 	case hub.Send_fn <- OpenChanTx:
+	// 		log.Println("Request message sent successfully")
+	// 	default:
+	// 		log.Println("Failed to send request message: channel is full or closed")
+	// 	}
+	// 	fmt.Println("------------------------------------------------------\n")
+	// }()
+
 	go func() {
 		benchmarking.Greeting()
-		// log.Println("\n------------------Send OpenChan Tx request--------------------")
-		// OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress))
-		// startTime = time.Now()
 
-		// select {
-		// case hub.Send_fn <- OpenChanTx:
-		// 	log.Println("Request message sent successfully")
-		// default:
-		// 	log.Println("Failed to send request message: channel is full or closed")
-		// }
-		// fmt.Println("------------------------------------------------------\n")
+		const requestNum = 5
+		wsEndpoint := client.BcWsEndpoint
+		bcClient, err := ethclient.Dial(wsEndpoint)
 
+<<<<<<< HEAD
+=======
+		privateKey := client.PrivateKey
+
+		publicKey := privateKey.Public()
+		publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+		if !ok {
+			log.Fatal("cannot assert type: publicKey is not of type *ecdsa.PublicKey")
+		}
+		fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+
+		nonce, err := bcClient.PendingNonceAt(context.Background(), fromAddress)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var totalReqGenTime time.Duration
+		for i := 0; i < requestNum; i++ {
+			// go func(i int) {
+			requestGenTimer := time.Now()
+			OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress), nonce+uint64(i))
+
+			duration := time.Since(requestGenTimer)
+			totalReqGenTime += duration
+			select {
+			case hub.Send_fn <- OpenChanTx:
+				log.Printf("Request %d sent successfully\n", i)
+			default:
+				log.Printf("Failed to send request %d: channel is full or closed\n", i)
+			}
+			// }(i)
+		}
+		log.Println("Average request generation time: ", totalReqGenTime/time.Duration(requestNum))
+
+		log.Println("All requests have been sent")
+
+>>>>>>> 2c759414002d851fc28e6fb6e2128aaa7093295a
 		// // Benchmarking for Geth nodes
 		// log.Println("\n------------------Send OpenChan Tx request to geth--------------------")
 		// benchmarking.GethSyncTx(client, common.HexToAddress(config.ContractAddress))
@@ -238,6 +359,7 @@ func main() {
 		// benchmarking.GethAsyncTx(client, common.HexToAddress(config.ContractAddress))
 		// fmt.Println("------------------------------------------------------\n")
 
+<<<<<<< HEAD
 		var testDuration time.Duration
 		const numRequest = 100
 		for i := 0; i < numRequest; i++ {
@@ -257,6 +379,22 @@ func main() {
 			fmt.Println("------------------------------------------------------\n")
 			time.Sleep(500 * time.Millisecond) // Sleep for 100 milliseconds
 		}
+=======
+		// for i := 0; i < 10; i++ {
+		// 	log.Println("\n------------------Send BalanceChecking request--------------------")
+		// 	balanceCheckingReq := sendRequests(client, client.Amount+20)
+
+		// 	startTimeQuerySslip = time.Now()
+		// 	select {
+		// 	case hub.Send_fn <- balanceCheckingReq:
+		// 		log.Println("Request message sent successfully")
+		// 	default:
+		// 		log.Println("Failed to send request message: channel is full or closed")
+		// 	}
+		// 	fmt.Println("------------------------------------------------------\n")
+		// 	time.Sleep(400 * time.Millisecond) // Sleep for 100 milliseconds
+		// }
+>>>>>>> 2c759414002d851fc28e6fb6e2128aaa7093295a
 
 
 		var totalDurationResponse time.Duration
@@ -286,10 +424,13 @@ func main() {
 		log.Println("Rest Verification: ", totalRestVerification / time.Duration(len(durationQueryRestVerifyTimes)))
 		// Benchmarking: geth requests
 
-		// benchmarking.GethSyncQuery(client)
+		// benchmarking.GethSyncQuery(client)  //20ms
 
 	}()
 
+	go func() {
+		// benchmarking.ProofGenerationAndVerification(client)
+	}()
 	select {}
 
 }
@@ -316,32 +457,6 @@ func sendRequests(client *client.Client, amount uint) []byte {
 	msg := protocol.GenerateRequest(client, 20, amount, jsonRequest, blockHeader.Hash())
 	client.Amount = amount
 	msgWType := append([]byte("REQ:"), msg...)
-	return msgWType
-}
-
-func sendOpenChanTxs(client *client.Client, contractAddress common.Address) []byte {
-	// in @openChan.go as well
-	wsEndpoint := client.BcWsEndpoint
-	bcClient, err := ethclient.Dial(wsEndpoint)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	blockHeader, _ := bcClient.HeaderByNumber(context.Background(), nil)
-	log.Println("Block Hash: ", blockHeader.Hash().Hex())
-
-	// log.Println("\n------------------Send OpenChan request--------------------")
-	fnAddr := common.HexToAddress("0xA2131E7503F7Dd11ff5dAAC09fa7c301e7Fe0f30")
-	deposit := big.NewInt(200000)
-	openChanSignTx := protocol.OpenChanTx(client, fnAddr, deposit, contractAddress)
-
-	msg := protocol.GenerateRequest(client, 20, client.Amount+100, openChanSignTx, blockHeader.Hash())
-
-	client.Amount += 100
-	msgWType := append([]byte("TX:"), msg...)
-
-	log.Println("Sending: ", string(msgWType))
-
 	return msgWType
 }
 
@@ -374,9 +489,9 @@ func verifyProof(client *client.Client, txHash common.Hash, proof mpt.Proof, blo
 	txRLP, _ := rlp.EncodeToBytes(tx)
 	key, _ := rlp.EncodeToBytes(uint32(idx))
 	txProofRLP, _ := mpt.VerifyProof(txRootHash[:], key, proof)
-	log.Println("txProofRLP: ", txProofRLP)
-	log.Println("txRLP: ", txRLP)
-	log.Println("proof: ", proof.Serialize())
+	// log.Println("txProofRLP: ", txProofRLP)
+	// log.Println("txRLP: ", txRLP)
+	// log.Println("proof: ", proof.Serialize())
 
 	return bytes.Equal(txRLP, txProofRLP)
 }
@@ -409,4 +524,58 @@ func verifySPProof(c *client.Client, proofTrie mpt.Proof, blockNr *big.Int, acco
 	}
 
 	return true, validAccountState
+}
+
+func calculateResults(results []Result, resultsMutex sync.Mutex) {
+	log.Println("Calculate results")
+	var totalProofDuration, totalDuration time.Duration
+	var successCount int
+
+	resultsMutex.Lock()
+	for _, result := range results {
+		if result.Success {
+			successCount++
+			totalProofDuration += result.ProofDuration
+			totalDuration += result.TotalDuration
+		}
+	}
+	resultsMutex.Unlock()
+
+	averageProofDuration := totalProofDuration / time.Duration(len(results))
+	averageTotalDuration := totalDuration / time.Duration(len(results))
+	successRate := float64(successCount) / float64(len(results)) * 100
+
+	log.Printf("Average Proof Verification Duration: %s\n", averageProofDuration)
+	log.Printf("Average Total Verification Duration: %s\n", averageTotalDuration)
+	log.Printf("Success Rate: %.2f%%\n", successRate)
+}
+
+func sendOpenChanTxs(client *client.Client, contractAddress common.Address, idx uint64) []byte {
+	// in @openChan.go as well
+	wsEndpoint := client.BcWsEndpoint
+	bcClient, err := ethclient.Dial(wsEndpoint)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	blockHeader, _ := bcClient.HeaderByNumber(context.Background(), nil)
+	log.Println("Block Hash: ", blockHeader.Hash().Hex())
+
+	// log.Println("\n------------------Send OpenChan request--------------------")
+	fnAddr := common.HexToAddress("0xA2131E7503F7Dd11ff5dAAC09fa7c301e7Fe0f30")
+	deposit := big.NewInt(200000)
+
+	signedTx := protocol.OpenChanTxToGeth(client, fnAddr, deposit, contractAddress, uint64(idx))
+
+	ts := types.Transactions{signedTx}
+	rawTxBytes, _ := rlp.EncodeToBytes(ts[0])
+
+	msg := protocol.GenerateRequest(client, 20, client.Amount+100, rawTxBytes, blockHeader.Hash())
+
+	client.Amount += 100
+	msgWType := append([]byte("TX:"), msg...)
+
+	log.Println("Sending: ", string(msgWType))
+
+	return msgWType
 }
