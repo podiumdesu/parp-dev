@@ -49,6 +49,8 @@ var startTimeQuerySslip time.Time
 var startTimeVerifySslip time.Time
 var durationQueryTimes []time.Duration
 var durationQueryVerifyTimes []time.Duration
+var durationQueryProofVerifyTimes []time.Duration
+var durationQueryRestVerifyTimes []time.Duration
 
 func main() {
 	// The hub is responsible for managing all the websocket connections
@@ -126,12 +128,19 @@ func main() {
 					log.Println("Unmarshal error: ", err)
 					break
 				}
-				// log.Println("size of proof for transactions: ", len(resMsg.Proof))
+
 				resMsgBodyHash := resMsg.BodyHashBytes()
 				res := cryptoutil.Verify(crypto.FromECDSAPub(client.ServerPublicKey), resMsgBodyHash, resMsg.Signature)
 				// log.Println("Verify Response signature:", res)
-
+				log.Println(resMsg.Proof)
+				ttLength := 0
+				for _, sublist := range resMsg.Proof {
+					ttLength += len(sublist)
+				}
+				log.Println("size of proof for transactions: ", ttLength)
 				proof, err := mpt.DeserializeProof(resMsg.Proof)
+
+				// log.Println("size of deserializedProof: ", len(proof))
 				if err != nil {
 					log.Println("Error deserializing proof: ", err)
 				}
@@ -148,29 +157,37 @@ func main() {
 			case "responseSP":
 				durationGetQueryBackSSLIP := time.Since(startTimeQuerySslip)
 				durationQueryTimes = append(durationQueryTimes, durationGetQueryBackSSLIP)
+
 				startTimeVerifySslip = time.Now()
-				log.Println(string(msg))
+				// log.Println(string(msg))
 				var resMsg resmsg.ResponseSPMsg
 				err := json.Unmarshal(msg, &resMsg)
 
-				log.Println("Size of the Request response: %d bytes", len(msg))
+				// log.Println("Size of the Request response: %d bytes", len(msg))
 
 				if err != nil {
 					log.Println("Unmarshal error: ", err)
 					break
 				}
-				res := cryptoutil.Verify(crypto.FromECDSAPub(client.ServerPublicKey), resMsg.BodyHashBytes(), resMsg.Signature)
-				log.Println("Verify Response signature:", res)
+				_ = cryptoutil.Verify(crypto.FromECDSAPub(client.ServerPublicKey), resMsg.BodyHashBytes(), resMsg.Signature)
+				// log.Println("Verify Response signature:", res)
 
+				proofVerifyTimer := time.Now()
 				proof, err := mpt.DeserializeProof(resMsg.Proof)
 				if err != nil {
 					log.Println("Error deserializing proof: ", err)
 				}
 				result, validState := verifySPProof(client, proof, resMsg.BlockNr, resMsg.Address)
+				proofVerifyDuration := time.Since(proofVerifyTimer)
+
+
 				log.Println(result, validState)
 				if result {
 					durationQueryVeriTime := time.Since(startTimeVerifySslip)
 					durationQueryVerifyTimes = append(durationQueryVerifyTimes, durationQueryVeriTime)
+					durationQueryRestTime := durationQueryVeriTime - proofVerifyDuration
+					durationQueryRestVerifyTimes = append(durationQueryRestVerifyTimes, durationQueryRestTime)
+					durationQueryProofVerifyTimes = append(durationQueryProofVerifyTimes, proofVerifyDuration)
 				}
 			default:
 				log.Println("Unrecognized message type: ", serverMsg.Type)
@@ -212,7 +229,7 @@ func main() {
 		// }
 		// fmt.Println("------------------------------------------------------\n")
 
-		// Benchmarking for Geth nodes
+		// // Benchmarking for Geth nodes
 		// log.Println("\n------------------Send OpenChan Tx request to geth--------------------")
 		// benchmarking.GethSyncTx(client, common.HexToAddress(config.ContractAddress))
 		// fmt.Println("------------------------------------------------------\n")
@@ -221,10 +238,15 @@ func main() {
 		// benchmarking.GethAsyncTx(client, common.HexToAddress(config.ContractAddress))
 		// fmt.Println("------------------------------------------------------\n")
 
-		for i := 0; i < 1000; i++ {
+		var testDuration time.Duration
+		const numRequest = 100
+		for i := 0; i < numRequest; i++ {
 			log.Println("\n------------------Send BalanceChecking request--------------------")
+			reqGeneTimer := time.Now()
 			balanceCheckingReq := sendRequests(client, client.Amount+20)
-
+			reqTime := time.Since(reqGeneTimer)
+			testDuration += reqTime
+			
 			startTimeQuerySslip = time.Now()
 			select {
 			case hub.Send_fn <- balanceCheckingReq:
@@ -236,21 +258,32 @@ func main() {
 			time.Sleep(500 * time.Millisecond) // Sleep for 100 milliseconds
 		}
 
-		// var totalDurationResponse time.Duration
-		// var totalDurationVerification time.Duration
-		// for _, d := range durationQueryTimes {
-		// 	totalDurationResponse += d
-		// }
-		// for _, d := range durationQueryVerifyTimes {
-		// 	totalDurationVerification += d
-		// }
 
-		// averageDurationResponse := totalDurationResponse / time.Duration(len(durationQueryTimes))
-		// averageDurationVerify := totalDurationVerification / time.Duration(len(durationQueryVerifyTimes))
+		var totalDurationResponse time.Duration
+		var totalDurationVerification time.Duration
+		var totalProofVerification time.Duration
+		var totalRestVerification time.Duration
+		for _, d := range durationQueryTimes {
+			totalDurationResponse += d
+		}
+		for _, d := range durationQueryVerifyTimes {
+			totalDurationVerification += d
+		}
+		for _, d := range durationQueryProofVerifyTimes {
+			totalProofVerification += d
+		}
 
-		// log.Printf("Average duration for %d requests: %s", len(durationQueryTimes), averageDurationResponse)
-		// log.Printf("Average duration for %d requests got verified: %s", len(durationQueryVerifyTimes), averageDurationVerify)
+		for _, d := range durationQueryRestVerifyTimes {
+			totalRestVerification += d
+		}
 
+		averageDurationResponse := totalDurationResponse / time.Duration(len(durationQueryTimes))
+		averageDurationVerify := totalDurationVerification / time.Duration(len(durationQueryVerifyTimes))
+		log.Println("Average request generation time: ", testDuration / time.Duration(numRequest))
+		log.Printf("Average duration for %d requests: %s", len(durationQueryTimes), averageDurationResponse)
+		log.Printf("Average duration for %d requests got verified: %s", len(durationQueryVerifyTimes), averageDurationVerify)
+		log.Println("Proof Verification time: ", totalProofVerification / time.Duration(len(durationQueryProofVerifyTimes)))
+		log.Println("Rest Verification: ", totalRestVerification / time.Duration(len(durationQueryRestVerifyTimes)))
 		// Benchmarking: geth requests
 
 		// benchmarking.GethSyncQuery(client)
