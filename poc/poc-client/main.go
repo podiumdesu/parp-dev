@@ -12,7 +12,9 @@ import (
 	"poc-server/mpt"
 	"poc-server/resmsg"
 	"sync"
+	"time"
 
+    "os"
 	"poc-client/client"
 	"poc-client/connection"
 	"poc-client/hub"
@@ -163,18 +165,42 @@ func main() {
 
 	wg.Wait()
 
-	go func() {
-		log.Println("\n------------------Send OpenChan Tx request--------------------")
-		OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress))
-		select {
-		case hub.Send_fn <- OpenChanTx:
-			log.Println("Request message sent successfully")
-		default:
-			log.Println("Failed to send request message: channel is full or closed")
-		}
-		fmt.Println("------------------------------------------------------\n")
+	// go func() {
+	// 	for i := 0; i < 30; i++ {
+	// 		log.Println("\n------------------Send OpenChan Tx request--------------------")
+	// 		OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress))
+	// 		select {
+	// 		case hub.Send_fn <- OpenChanTx:
+	// 			log.Println("Request message sent successfully")
+	// 		default:
+	// 			log.Println("Failed to send request message: channel is full or closed")
+	// 		}
+	// 		fmt.Println("------------------------------------------------------\n")
+	// 		time.Sleep(30 * time.Second)
+	// 	}
+	// }()
 
-		for i := 0; i < 1; i++ {
+	
+	go func() {
+		currentDateTime := time.Now().Format("2006-01-02 15:04:05")
+
+		// Open a file. Create the file if it does not exist and truncate it if it does.
+		file, err := os.OpenFile("date.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			fmt.Println("Error opening file:", err)
+			return
+		}
+		defer file.Close() // Ensure the file is closed after the function exits
+	
+		// Write the current date to the file
+		_, err = fmt.Fprintf(file, "Start: Current Date: %s\n", currentDateTime)
+		if err != nil {
+			fmt.Println("Error writing to file:", err)
+			return
+		}
+	
+		fmt.Println("Date written successfully")
+		for i := 0; i < 240; i++ {
 			log.Println("\n------------------Send BalanceChecking request--------------------")
 			balanceCheckingReq := sendRequests(client, client.Amount+20)
 			select {
@@ -184,10 +210,16 @@ func main() {
 				log.Println("Failed to send request message: channel is full or closed")
 			}
 			fmt.Println("------------------------------------------------------\n")
+			time.Sleep(500 * time.Millisecond)
 		}
-
+		currentDateTime = time.Now().Format("2006-01-02 15:04:05")
+		_, err = fmt.Fprintf(file, "End: Current Date: %s\n", currentDateTime)
+		if err != nil {
+			fmt.Println("Error writing to file:", err)
+			return
+		}
+	
 	}()
-
 	// // Setup webpage for front end
 	// http.HandleFunc("/", web.HomeHandler)
 
