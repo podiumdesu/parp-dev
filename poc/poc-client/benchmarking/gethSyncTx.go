@@ -36,7 +36,7 @@ func GethSyncTx (client *client.Client, contractAddress common.Address) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		duration, err := sendOpenChanTxsToGeth(client, contractAddress, nonce)
+		duration, err := sendOpenChanTxsToGeth(client, bcClient, contractAddress, nonce)
 		if duration != 0 {
 			successNum += 1
 		}
