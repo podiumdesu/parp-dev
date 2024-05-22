@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/json"
-	"log"
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -76,7 +75,7 @@ func (pb *PaymentBody) HashByte() []byte {
 }
 
 func (pb *PaymentBody) PreHashByte() []byte {
-	log.Println("----------PB----")
+	// log.Println("----------PB----")
 
 	// prefixed hash for ethereum signautre message
 	return GeneratePrefixedHash(pb.HashByte())

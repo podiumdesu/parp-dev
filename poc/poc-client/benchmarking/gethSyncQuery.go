@@ -24,7 +24,6 @@ func GethSyncQuery(client *client.Client) {
 		log.Fatal(err)
 	}
 
-
 	request := request.JSONRPCRequest{
 		JSONRPC: "2.0",
 		Method:  "eth_getBalance",
