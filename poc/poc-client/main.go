@@ -18,6 +18,7 @@ import (
 	"poc-client/client"
 	"poc-client/connection"
 	"poc-client/hub"
+	"poc-client/gethbenchmarking"
 	"poc-client/hub/wsClient"
 	"poc-client/msg/request"
 	"poc-client/protocol"
@@ -147,23 +148,23 @@ func main() {
 
 	}()
 
-	wg.Add(1)
+	// wg.Add(1)
 
-	go func() {
-		log.Println("\n------------------Handshake-------------------")
+	// go func() {
+	// 	log.Println("\n------------------Handshake-------------------")
 
-		defer wg.Done()
-		msg := client.InitHandshakeMsg(config.ContractAddress, 10, big.NewInt(100000), big.NewInt(200))
-		b := append([]byte("HANDSHAKE:"), msg.Bytes()...)
+	// 	defer wg.Done()
+	// 	msg := client.InitHandshakeMsg(config.ContractAddress, 10, big.NewInt(100000), big.NewInt(200))
+	// 	b := append([]byte("HANDSHAKE:"), msg.Bytes()...)
 
-		// b := []byte("HANDSHAKE:" + string(client.PubKeyBytes()))
-		log.Println("Sending: ", b)
-		hub.Send_fn <- b //[]byte("SIG:qwerrtqreqwrqwerqwrwerqwrewqtqwetqwrewqrqwerwqewqrqwer")
-		fmt.Println("----------------------------------------------\n")
-		hub.Send_fn <- []byte("FE: Connected to server")
-	}()
+	// 	// b := []byte("HANDSHAKE:" + string(client.PubKeyBytes()))
+	// 	log.Println("Sending: ", b)
+	// 	hub.Send_fn <- b //[]byte("SIG:qwerrtqreqwrqwerqwrwerqwrewqtqwetqwrewqrqwerwqewqrqwer")
+	// 	fmt.Println("----------------------------------------------\n")
+	// 	hub.Send_fn <- []byte("FE: Connected to server")
+	// }()
 
-	wg.Wait()
+	// wg.Wait()
 
 	// go func() {
 	// 	for i := 0; i < 30; i++ {
@@ -200,18 +201,22 @@ func main() {
 		}
 	
 		fmt.Println("Date written successfully")
-		for i := 0; i < 240; i++ {
-			log.Println("\n------------------Send BalanceChecking request--------------------")
-			balanceCheckingReq := sendRequests(client, client.Amount+20)
-			select {
-			case hub.Send_fn <- balanceCheckingReq:
-				log.Println("Request message sent successfully")
-			default:
-				log.Println("Failed to send request message: channel is full or closed")
-			}
-			fmt.Println("------------------------------------------------------\n")
-			time.Sleep(500 * time.Millisecond)
-		}
+		// logic for requests
+		// for i := 0; i < 240; i++ {
+		// 	log.Println("\n------------------Send BalanceChecking request--------------------")
+		// 	balanceCheckingReq := sendRequests(client, client.Amount+20)
+		// 	select {
+		// 	case hub.Send_fn <- balanceCheckingReq:
+		// 		log.Println("Request message sent successfully")
+		// 	default:
+		// 		log.Println("Failed to send request message: channel is full or closed")
+		// 	}
+		// 	fmt.Println("------------------------------------------------------\n")
+		// 	time.Sleep(500 * time.Millisecond)
+		// }
+
+		gethbenchmarking.GethSyncQuery(client)
+
 		currentDateTime = time.Now().Format("2006-01-02 15:04:05")
 		_, err = fmt.Fprintf(file, "End: Current Date: %s\n", currentDateTime)
 		if err != nil {

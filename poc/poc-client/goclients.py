@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def run_client_instance():
     """Function to start a client and handle its output."""
-    process = subprocess.Popen(['./myclient'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    process = subprocess.Popen(['./myclienttogeth'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     stdout, stderr = process.communicate()
     return stdout, stderr
 
@@ -15,7 +15,7 @@ def write_current_datetime_to_file(client_number):
     current_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Define the directory path where the logs will be stored
-    directory = f"client-logs/pyscript/"
+    directory = f"client-logs/geth/pyscript/"
     
     # Ensure the directory exists; if not, create it
     if not os.path.exists(directory):
@@ -46,7 +46,7 @@ def main(num_instances):
                 print(f"Error: {stderr}")
 
 if __name__ == '__main__':
-    num_instances = 15  # Number of times you want to run the program
+    num_instances = 25  # Number of times you want to run the program
     write_current_datetime_to_file(num_instances)
 
     main(num_instances)
