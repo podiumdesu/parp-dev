@@ -398,7 +398,8 @@ func main() {
 	}()
 
 	go func() {
-		benchmarking.ProofGenerationAndVerification(client)
+		// benchmarking.ProofGenerationAndVerification(client)
+		benchmarking.SPBenchmarking(client)
 	}()
 	select {}
 

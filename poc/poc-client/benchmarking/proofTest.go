@@ -27,8 +27,13 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/rpc"
 )
 
+func SPBenchmarking(client *client.Client) {
+	msg := sendQueryRequests(client, 100)
+	generateSPProofAverage(msg, 100, client, nil)
+}
 func ProofGenerationAndVerification(client *client.Client) {
 	wsEndpoint := client.BcWsEndpoint
 	bcClient, _ := ethclient.Dial(wsEndpoint)
@@ -197,91 +202,198 @@ func verifyProofAverage(numRequests int, client *client.Client, blockNr *big.Int
 	// return msg
 }
 
-// func generateSPProofAverage(numRequests int, c *client.Client, blockNr *big.Int) []mpt.Proof {
-// 	log.Println("GenerateProofAverage")
-// 	wsEndpoint := c.BcWsEndpoint
-// 	bcClient, _ := ethclient.Dial(wsEndpoint)
+func sendQueryRequests(client *client.Client, amount uint) []byte {
+	wsEndpoint := client.BcWsEndpoint
+	bcClient, err := ethclient.Dial(wsEndpoint)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-// 	// blockHex := blockN.Text(16)
-// 	rpcClient, _ := rpc.Dial("http://localhost:8000")
-// 	var resultProof json.RawMessage
-// 	// var paramsGenerated = []interface{}{
-// 	// 	address, []string{pos}, blockHex,
-// 	// }
-// 	address := "0x094D6cd9dA692A4c490C1F8AD3E74D089E3492D6"
-// 	channelID :=
-// 	log.Println(pos)
-// 	log.Println(blockN.Text(16))
-// 	var paramsGenerated = []interface{}{
-// 		address, []string{pos}, "0x" + blockN.Text(16),
-// 	}
+	blockHeader, _ := bcClient.HeaderByNumber(context.Background(), nil)
 
-// 	err := rpcClient.Call(&resultProof, "eth_getProof", paramsGenerated...)
-// 	if err != nil {
-// 		log.Fatalf("Failed to execute request: %v", err)
-// 	}
-// 	log.Println(resultProof)
+	request := request.JSONRPCRequest{
+		JSONRPC: "2.0",
+		Method:  "eth_getBalance",
+		Params:  []interface{}{"0xBcd55Cd8ED4DC2b7473335935EaEd93Dc6AF4576", "0x", "latest"},
+		ID:      1,
+	}
+	jsonRequest, err := json.Marshal(request)
+	if err != nil {
+		log.Println(err)
+	}
+	msg := protocol.GenerateRequest(client, 20, amount, jsonRequest, blockHeader.Hash())
+	client.Amount = amount
+	msgWType := append([]byte("REQ:"), msg...)
+	return msgWType
+}
 
-// 	extendedResultProof := append([]byte(`{"jsonrpc":"2.0","id":1,"result":`), resultProof...)
-// 	extendedResultProof = append(extendedResultProof, []byte(`}`)...)
+func generateSPProofAverage(msg []byte, numRequests int, c *client.Client, blockNr *big.Int) {
+	parts := strings.SplitN(string(msg), ":", 2)
+	if len(parts) < 2 {
+		log.Println("Invalid message format")
+		return
+	}
 
-// 	log.Println(string(extendedResultProof))
-// 	// load into the struct
-// 	var response mpt.EthGetProofResponse
-// 	err = json.Unmarshal(extendedResultProof, &response)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	result := response.Result
+	header := parts[0]
+	body := parts[1]
+	switch header {
+	case "REQ":
+		var req request.RequestMsg
+		err := json.Unmarshal([]byte(body), &req)
+		if err != nil {
+			log.Fatal("Unmarshal error: ", err)
+			break
+		}
+		log.Println("GenerateProofAverage")
+		// wsEndpoint := c.BcWsEndpoint
+		// bcClient, _ := ethclient.Dial(wsEndpoint)
 
-// 	// account := common.HexToAddress("0xcca577ee56d30a444c73f8fc8d5ce34ed1c7da8b")
-// 	account := common.HexToAddress(address)
-// 	fmt.Println(fmt.Sprintf("decoded account state data from untrusted source for address %x: balance is %x, nonce is %x, codeHash: %x, storageHash: %x",
-// 		account, result.Balance, result.Nonce, result.CodeHash, result.StorageHash))
+		// blockHex := blockN.Text(16)
+		rpcClient, _ := rpc.Dial("http://172.22.29.197:8001")
+		var resultProof json.RawMessage
+		// var paramsGenerated = []interface{}{
+		// 	address, []string{pos}, blockHex,
+		// }
+		// address := "0x094D6cd9dA692A4c490C1F8AD3E74D089E3492D6"
+		// channelID :=
+		// 	log.Println(pos)
+		// log.Println(blockN.Text(16))
+		// var paramsGenerated = []interface{}{
+		// 	address, []string{pos}, "0x" + blockN.Text(16),
+		// }
 
-// 	// get the state root hash from etherscan: https://etherscan.io/block/11045195
-// 	// stateRootHash := common.HexToHash("0x8c571da4c95e212e508c98a50c2640214d23f66e9a591523df6140fd8d113f29")
+		address := "0xBcd55Cd8ED4DC2b7473335935EaEd93Dc6AF4576" // Replace with the address you want to query
+		keys := []string{"0x"}                                  // Storage keys you want to query, "0x" is for querying the balance
+		blockNumber := big.NewInt(10)                           // Can be a specific block number like "0xAABBCC" or "latest"
 
-// 	// create a proof trie, and add each node from the account proof
-// 	proofTrie := mpt.NewProofDB()
-// 	for _, node := range result.AccountProof {
-// 		proofTrie.Put(crypto.Keccak256(node), node)
-// 	}
+		var paramsGenerated = []interface{}{
+			address, []string(keys), "0x" + blockNumber.Text(16),
+		}
+		err = rpcClient.Call(&resultProof, "eth_getProof", paramsGenerated...)
+		if err != nil {
+			log.Fatalf("Failed to execute request: %v", err)
+		}
+		log.Println("resultProof length: ", len(resultProof))
 
-// 	return proofTrie
+		generateResTimer := time.Now()
+		generateProofTimer := time.Now()
+		extendedResultProof := append([]byte(`{"jsonrpc":"2.0","id":1,"result":`), resultProof...)
+		extendedResultProof = append(extendedResultProof, []byte(`}`)...)
 
-// 	block, _ := bcClient.BlockByNumber(context.Background(), blockNr)
+		var response mpt.EthGetProofResponse
 
-// 	txs := block.Transactions()
-// 	// txs := TransactionsJSON()
-// 	log.Println("in total transactions number: ", numRequests)
+		err = json.Unmarshal(extendedResultProof, &response)
+		if err != nil {
+			log.Fatal(err)
+		}
+		result := response.Result
 
-// 	var totalDuration time.Duration
+		// get the proof trie
+		storageProof := mpt.NewProofDB()
+		for _, node := range result.AccountProof {
+			storageProof.Put(crypto.Keccak256(node), node)
+		}
 
-// 	var proofArray []mpt.Proof
-// 	for i := 0; i < numRequests; i++ {
-// 		// log.Println("Generate Proof Average Transaction ", i)
-// 		tx := txs[i]
-// 		start := time.Now()
-// 		proof, _ := generateProof(block, tx.Hash())
-// 		log.Println(tx.Hash())
-// 		duration := time.Since(start)
-// 		totalDuration += duration
+		generateProofTime := time.Since(generateProofTimer)
+		responseSPBody := resmsg.ResponseSPBody{
+			SignedReqBody: req.SignedReqBody,
+			Proof:         storageProof.CustomSerialize(),
+			Address:       common.HexToAddress(address),
+			BlockNr:       blockNr,
+		}
 
-// 		proofArray = append(proofArray, proof)
+		serverPrivKey, _ := crypto.HexToECDSA("bcd5c542c981dbb7cee1f3352fcee082581b4a323bf5cbff105aa84fa718f690")
+		sig := cryptoutil.Sign(serverPrivKey, responseSPBody.HashBytes())
+		responseSPMsg := resmsg.ResponseSPMsg{
+			Type:               "responseSP",
+			ChannelId:          common.HexToHash("0xBcd55Cd8ED4DC2b7473335935EaEd93Dc6AF4576"),
+			Amount:             req.Amount,
+			SignedReqBody:      req.SignedReqBody,
+			CurrentBlockHeight: blockNumber,
+			ReturnValue:        []byte("success"),
+			Proof:              storageProof.CustomSerialize(),
+			Address:            common.HexToAddress(address),
+			BlockNr:            blockNumber,
+			Signature:          sig,
+		}
 
-// 		ttLength := 0
-// 		for _, sublist := range proof.CustomSerialize() {
-// 			ttLength += len(sublist)
-// 		}
-// 		// log.Println("size of proof: ", ttLength)
-// 	}
+		generationTime := time.Since(generateResTimer)
+		log.Println(generateProofTime)
+		log.Println(generationTime)
 
-// 	averageDuration := totalDuration / time.Duration(numRequests)
-// 	fmt.Printf("Average proof generation time: %s\n", averageDuration)
+		log.Println(responseSPMsg)
+		fmt.Println("------------------------------------------------------\n")
 
-// 	return proofArray
-// }
+		// state, validAccountState := verifyStorageProof(proofTrie, address, stateRoot)
+		// log.Println("state	", state)
+		// log.Println(validAccountState)
+	}
+	return
+
+	// load into the struct
+
+	// account := common.HexToAddress("0xcca577ee56d30a444c73f8fc8d5ce34ed1c7da8b")
+	// account := common.HexToAddress(address)
+	// fmt.Println(fmt.Sprintf("decoded account state data from untrusted source for address %x: balance is %x, nonce is %x, codeHash: %x, storageHash: %x",
+	// 	account, result.Balance, result.Nonce, result.CodeHash, result.StorageHash))
+
+	// get the state root hash from etherscan: https://etherscan.io/block/11045195
+	// stateRootHash := common.HexToHash("0x8c571da4c95e212e508c98a50c2640214d23f66e9a591523df6140fd8d113f29")
+
+	// create a proof trie, and add each node from the account proof
+
+	// block, _ := bcClient.BlockByNumber(context.Background(), blockNr)
+
+	// txs := block.Transactions()
+	// // txs := TransactionsJSON()
+	// log.Println("in total transactions number: ", numRequests)
+
+	// var totalDuration time.Duration
+
+	// var proofArray []mpt.Proof
+	// for i := 0; i < numRequests; i++ {
+	// 	// log.Println("Generate Proof Average Transaction ", i)
+	// 	tx := txs[i]
+	// 	start := time.Now()
+	// 	proof, _ := generateProof(block, tx.Hash())
+	// 	log.Println(tx.Hash())
+	// 	duration := time.Since(start)
+	// 	totalDuration += duration
+
+	// 	proofArray = append(proofArray, proof)
+
+	// 	ttLength := 0
+	// 	for _, sublist := range proof.CustomSerialize() {
+	// 		ttLength += len(sublist)
+	// 	}
+	// 	// log.Println("size of proof: ", ttLength)
+	// }
+
+	// averageDuration := totalDuration / time.Duration(numRequests)
+	// fmt.Printf("Average proof generation time: %s\n", averageDuration)
+
+	// return proofArray
+
+}
+
+func verifyStorageProof(proofTrie *mpt.ProofDB, account string, stateRootHash common.Hash) (bool, []byte) {
+	log.Println("stateRootHash: ", stateRootHash)
+	accountAddr := common.HexToAddress(account)
+	// stateRootHash = common.HexToHash("0x7b127327de0842612844cf2c450a42270de0fefbf86ef75dc5d82777df0be300")
+
+	// verify the proof against the stateRootHash
+	validAccountState, err := mpt.VerifyProof(
+		stateRootHash.Bytes(), crypto.Keccak256(accountAddr.Bytes()), proofTrie)
+
+	if err != nil {
+		log.Fatal(err)
+		return false, nil
+	}
+
+	log.Println(validAccountState)
+	return true, validAccountState
+
+}
 
 func generateTxProofAverage(numRequests int, c *client.Client, blockNr *big.Int) []mpt.Proof {
 	log.Println("GenerateProofAverage")
