@@ -218,6 +218,8 @@ func sendQueryRequests(client *client.Client, amount uint) []byte {
 		ID:      1,
 	}
 	jsonRequest, err := json.Marshal(request)
+	log.Println(jsonRequest)
+	log.Println(len(jsonRequest))
 	if err != nil {
 		log.Println(err)
 	}
