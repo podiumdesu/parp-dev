@@ -1,3 +1,5 @@
+// manage the hub functionalities
+
 package hub
 
 import (
