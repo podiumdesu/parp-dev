@@ -1,19 +1,17 @@
-package protocol
+package client
 
 import (
 	"encoding/hex"
 	"encoding/json"
 	"log"
-	"poc-client/client"
 	"poc-client/msg/request"
 
 	"github.com/ethereum/go-ethereum/common"
 )
 
-// PoC client generates the request
-
-func GenerateRequest(c *client.Client, ch int, amount uint, reqByte []byte, blockHash common.Hash) []byte {
+func (c *Client) generateParpRequest(ch int, amount uint, reqByte []byte, blockHash common.Hash) []byte {
 	log.Println(reqByte)
+
 	requestBody := request.ReqBody{
 		ChannelID:      ch,
 		Amount:         amount,

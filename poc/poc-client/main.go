@@ -1,13 +1,8 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"math/big"
-	"poc-server/resmsg"
 	"sync"
 
 	"poc-client/client"
@@ -15,11 +10,6 @@ import (
 	"poc-client/handlers"
 	"poc-client/hub"
 	"poc-client/hub/wsClient"
-	"poc-client/msg/request"
-	"poc-client/protocol"
-
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 var wg sync.WaitGroup
@@ -34,7 +24,7 @@ type Config struct {
 
 func main() {
 	// The hub is responsible for managing all the websocket connections
-	config, _ := loadConfig("localConfig.json")
+	// config, _ := loadConfig("localConfig.json")
 
 	// Generate a new client from the local configuration file
 	log.Println("\n-----------------Generate a new client-------------------")
@@ -69,124 +59,109 @@ func main() {
 		}
 	}()
 
-	wg.Add(1)
+	go client.Start(hub.Send_fn)
 
-	go func() {
-		log.Println("\n------------------Handshake-------------------")
-
-		defer wg.Done()
-		msg := client.InitHandshakeMsg(config.ContractAddress, 10, big.NewInt(100000), big.NewInt(200))
-		b := append([]byte("HANDSHAKE:"), msg.Bytes()...)
-
-		// b := []byte("HANDSHAKE:" + string(client.PubKeyBytes()))
-		log.Println("Sending: ", b)
-		hub.Send_fn <- b //[]byte("SIG:qwerrtqreqwrqwerqwrwerqwrewqtqwetqwrewqrqwerwqewqrqwer")
-		fmt.Println("----------------------------------------------\n")
-		hub.Send_fn <- []byte("FE: Connected to server")
-	}()
-
-	wg.Wait()
-
-	go func() {
-		log.Println("\n------------------Send OpenChan Tx request--------------------")
-		OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress))
-		select {
-		case hub.Send_fn <- OpenChanTx:
-			log.Println("Request message sent successfully")
-		default:
-			log.Println("Failed to send request message: channel is full or closed")
-		}
-		fmt.Println("------------------------------------------------------\n")
-
-		for i := 0; i < 1; i++ {
-			log.Println("\n------------------Send BalanceChecking request--------------------")
-			balanceCheckingReq := sendRequests(client, client.Amount+20)
-			select {
-			case hub.Send_fn <- balanceCheckingReq:
-				log.Println("Request message sent successfully")
-			default:
-				log.Println("Failed to send request message: channel is full or closed")
-			}
-			fmt.Println("------------------------------------------------------\n")
-		}
-
-	}()
 	select {}
 
-}
+	// go func() {
+	// 	log.Println("\n------------------Send OpenChan Tx request--------------------")
+	// 	OpenChanTx := sendOpenChanTxs(client, common.HexToAddress(config.ContractAddress))
+	// 	select {
+	// 	case hub.Send_fn <- OpenChanTx:
+	// 		log.Println("Request message sent successfully")
+	// 	default:
+	// 		log.Println("Failed to send request message: channel is full or closed")
+	// 	}
+	// 	fmt.Println("------------------------------------------------------\n")
 
-func sendRequests(client *client.Client, amount uint) []byte {
-	wsEndpoint := client.BcWsEndpoint
-	bcClient, err := ethclient.Dial(wsEndpoint)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// 	for i := 0; i < 1; i++ {
+	// 		log.Println("\n------------------Send BalanceChecking request--------------------")
+	// 		balanceCheckingReq := sendRequests(client, client.Amount+20)
+	// 		select {
+	// 		case hub.Send_fn <- balanceCheckingReq:
+	// 			log.Println("Request message sent successfully")
+	// 		default:
+	// 			log.Println("Failed to send request message: channel is full or closed")
+	// 		}
+	// 		fmt.Println("------------------------------------------------------\n")
+	// 	}
 
-	blockHeader, _ := bcClient.HeaderByNumber(context.Background(), nil)
-
-	request := request.JSONRPCRequest{
-		JSONRPC: "2.0",
-		Method:  "eth_getBalance",
-		Params:  []interface{}{"0xA2131E7503F7Dd11ff5dAAC09fa7c301e7Fe0f30", "latest"},
-		ID:      1,
-	}
-	jsonRequest, err := json.Marshal(request)
-	if err != nil {
-		log.Println(err)
-	}
-	msg := protocol.GenerateRequest(client, 20, amount, jsonRequest, blockHeader.Hash())
-	client.Amount = amount
-	msgWType := append([]byte("REQ:"), msg...)
-	return msgWType
-}
-
-func sendOpenChanTxs(client *client.Client, contractAddress common.Address) []byte {
-	// in @openChan.go as well
-	wsEndpoint := client.BcWsEndpoint
-	bcClient, err := ethclient.Dial(wsEndpoint)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	blockHeader, _ := bcClient.HeaderByNumber(context.Background(), nil)
-	log.Println("Block Hash: ", blockHeader.Hash().Hex())
-
-	// log.Println("\n------------------Send OpenChan request--------------------")
-	fnAddr := common.HexToAddress("0xA2131E7503F7Dd11ff5dAAC09fa7c301e7Fe0f30")
-	deposit := big.NewInt(200000)
-	openChanSignTx := protocol.OpenChanTx(client, fnAddr, deposit, contractAddress)
-
-	msg := protocol.GenerateRequest(client, 20, client.Amount+100, openChanSignTx, blockHeader.Hash())
-
-	client.Amount += 100
-	msgWType := append([]byte("TX:"), msg...)
-
-	log.Println("Sending: ", string(msgWType))
-
-	return msgWType
+	// }()
 
 }
-func loadConfig(filename string) (*Config, error) {
-	// Read configuration file
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
 
-	// Parse configuration from JSON
-	var config Config
-	if err := json.Unmarshal(data, &config); err != nil {
-		return nil, err
-	}
+// func sendRequests(client *client.Client, amount uint) []byte {
+// 	wsEndpoint := client.BcWsEndpoint
+// 	bcClient, err := ethclient.Dial(wsEndpoint)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	return &config, nil
-}
+// 	blockHeader, _ := bcClient.HeaderByNumber(context.Background(), nil)
 
-func VerifyFraudProof(resMsg resmsg.ResponseMsg) bool {
+// 	request := request.JSONRPCRequest{
+// 		JSONRPC: "2.0",
+// 		Method:  "eth_getBalance",
+// 		Params:  []interface{}{"0xA2131E7503F7Dd11ff5dAAC09fa7c301e7Fe0f30", "latest"},
+// 		ID:      1,
+// 	}
+// 	jsonRequest, err := json.Marshal(request)
+// 	if err != nil {
+// 		log.Println(err)
+// 	}
+// 	msg := protocol.GenerateRequest(client, 20, amount, jsonRequest, blockHeader.Hash())
+// 	client.Amount = amount
+// 	msgWType := append([]byte("REQ:"), msg...)
+// 	return msgWType
+// }
 
-	return true
+// func sendOpenChanTxs(client *client.Client, contractAddress common.Address) []byte {
+// 	// in @openChan.go as well
+// 	wsEndpoint := client.BcWsEndpoint
+// 	bcClient, err := ethclient.Dial(wsEndpoint)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-}
+// 	blockHeader, _ := bcClient.HeaderByNumber(context.Background(), nil)
+// 	log.Println("Block Hash: ", blockHeader.Hash().Hex())
+
+// 	// log.Println("\n------------------Send OpenChan request--------------------")
+// 	fnAddr := common.HexToAddress("0xA2131E7503F7Dd11ff5dAAC09fa7c301e7Fe0f30")
+// 	deposit := big.NewInt(200000)
+// 	openChanSignTx := protocol.OpenChanTx(client, fnAddr, deposit, contractAddress)
+
+// 	msg := protocol.GenerateRequest(client, 20, client.Amount+100, openChanSignTx, blockHeader.Hash())
+
+// 	client.Amount += 100
+// 	msgWType := append([]byte("TX:"), msg...)
+
+// 	log.Println("Sending: ", string(msgWType))
+
+// 	return msgWType
+
+// }
+// func loadConfig(filename string) (*Config, error) {
+// 	// Read configuration file
+// 	data, err := ioutil.ReadFile(filename)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	// Parse configuration from JSON
+// 	var config Config
+// 	if err := json.Unmarshal(data, &config); err != nil {
+// 		return nil, err
+// 	}
+
+// 	return &config, nil
+// }
+
+// func VerifyFraudProof(resMsg resmsg.ResponseMsg) bool {
+
+// 	return true
+
+// }
 
 // // Setup webpage for front end
 // http.HandleFunc("/", web.HomeHandler)
