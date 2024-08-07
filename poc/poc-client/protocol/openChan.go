@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	pocClient "poc-client/client"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -18,15 +17,16 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
-func OpenChanTx(c *pocClient.Client, fnAddr common.Address, deposit *big.Int, contractAddress common.Address) []byte {
+func OpenChanTx(bcClient *ethclient.Client, privateKey *ecdsa.PrivateKey, fnAddr common.Address, deposit *big.Int, contractAddress common.Address) []byte {
 	// Setup Account
-	wsEndpoint := c.BcWsEndpoint
-	client, err := ethclient.Dial(wsEndpoint)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// wsEndpoint := c.BcWsEndpoint
+	// bcClient, err := c.ConnectToBlockchain()
 
-	privateKey := c.PrivateKey
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// privateKey := c.PrivateKey
 	// privateKey, err := crypto.HexToECDSA("535468b2ddcd8fc2b87c3b825922880c0d9f546095908bb924f1053e39852d5a")
 	// if err != nil {
 	// 	log.Fatal(err)
@@ -37,11 +37,11 @@ func OpenChanTx(c *pocClient.Client, fnAddr common.Address, deposit *big.Int, co
 		log.Fatal("cannot assert type: publicKey is not of type *ecdsa.PublicKey")
 	}
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	nonce, err := bcClient.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
-	gasPrice, err := client.SuggestGasPrice(context.Background())
+	gasPrice, err := bcClient.SuggestGasPrice(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -67,7 +67,7 @@ func OpenChanTx(c *pocClient.Client, fnAddr common.Address, deposit *big.Int, co
 
 	// Create transaction
 	tx := types.NewTransaction(nonce, contractAddress, deposit, gasLimit, gasPrice, data)
-	chainID, err := client.NetworkID(context.Background())
+	chainID, err := bcClient.NetworkID(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}

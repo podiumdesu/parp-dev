@@ -18,6 +18,7 @@ type Client struct {
 	PrivateKey      *ecdsa.PrivateKey
 	PublicKey       *ecdsa.PublicKey
 	ServerPublicKey *ecdsa.PublicKey
+	ContractAddress string
 	Address         common.Address
 	ConnectFN       common.Address
 	FeeStandards    int

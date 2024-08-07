@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-func (c *Client) Init(p string, bcWsEndpoint string, bcRpcEndpoint string, serverEndpoint string) *Client {
+func (c *Client) Init(p string, bcWsEndpoint string, bcRpcEndpoint string, serverEndpoint string, contractAddress string) *Client {
 	// generate the necessary account information
 	privateKey := &ecdsa.PrivateKey{}
 
@@ -57,6 +57,7 @@ func (c *Client) Init(p string, bcWsEndpoint string, bcRpcEndpoint string, serve
 		PrivateKey:      privateKey,
 		PublicKey:       publicKeyECDSA,
 		ServerPublicKey: nil,
+		ContractAddress: contractAddress,
 		Address:         address,
 		ConnectFN:       common.Address{},
 		FeeStandards:    0,

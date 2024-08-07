@@ -47,3 +47,15 @@ func (c *Client) Verify(hash []byte, sig []byte) bool {
 	pubKeyByte := crypto.FromECDSAPub(c.PublicKey)
 	return crypto.VerifySignature(pubKeyByte, hash, signatureNoRecoverID)
 }
+
+func (c *Client) PrivKeyBytes() []byte {
+	return crypto.FromECDSA(c.PrivateKey)
+}
+
+func (c *Client) PubKeyBytes() []byte {
+	return crypto.FromECDSAPub(&c.PrivateKey.PublicKey)
+}
+
+func (c *Client) AddrHex() string {
+	return c.Address.Hex()
+}
