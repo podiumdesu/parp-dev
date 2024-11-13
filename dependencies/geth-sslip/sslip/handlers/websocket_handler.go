@@ -98,7 +98,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 		client := m.GetClient(clientID)
 
 		for {
-			_, msg, err := conn.ReadMessage()
+			mt, msg, err := conn.ReadMessage()
 			if err != nil {
 				if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
 					log.Printf("Client %s disconnected", clientID)
@@ -374,7 +374,6 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 					Signature:          sig,
 				}
 
-
 				// fmt.Println(responseMsg.Keccak256Hash())
 
 				fmt.Println("ResponseMsg:")
@@ -404,7 +403,6 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 				// log.Println("Submit to chain: ", reqBodyBytesString)
 
 				_ = conn.WriteMessage(mt, responseMsg.Bytes())
-
 
 				fmt.Println("------------------------------------------------------")
 
