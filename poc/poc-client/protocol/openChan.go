@@ -3,8 +3,6 @@ package protocol
 import (
 	"context"
 	"crypto/ecdsa"
-	"encoding/hex"
-	"fmt"
 	"log"
 	"math/big"
 	"strings"
@@ -66,6 +64,8 @@ func OpenChanTx(bcClient *ethclient.Client, privateKey *ecdsa.PrivateKey, fnAddr
 	}
 
 	// Create transaction
+	// Note: NewTransaction is deprecated, https://github.com/nnqq/geth-tx-hash-bug/blob/master/main.go
+
 	tx := types.NewTransaction(nonce, contractAddress, deposit, gasLimit, gasPrice, data)
 	chainID, err := bcClient.NetworkID(context.Background())
 	if err != nil {
@@ -73,15 +73,15 @@ func OpenChanTx(bcClient *ethclient.Client, privateKey *ecdsa.PrivateKey, fnAddr
 	}
 
 	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainID), privateKey)
-	log.Print(fmt.Sprintf("chainID: %s", chainID))
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	ts := types.Transactions{signedTx}
 	rawTxBytes, _ := rlp.EncodeToBytes(ts[0])
-	rawTxHex := hex.EncodeToString(rawTxBytes)
+	// rawTxHex := hex.EncodeToString(rawTxBytes)
 
-	fmt.Printf(rawTxHex) // f86...772
+	// fmt.Printf(rawTxHex) // f86...772
 	return rawTxBytes
 }
