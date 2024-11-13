@@ -3,8 +3,10 @@ package mpt
 import (
 	"encoding/hex"
 	"fmt"
+	"log"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/trie"
 )
 
@@ -24,7 +26,15 @@ type Proof interface {
 	// Serialize returns the serialized proof
 	Serialize() [][]byte
 
+	// DeserializeProof(proof [][]byte) *ProofDB
+
 	CustomSerialize() [][]byte
+
+	CustomRLPSerialize() [][]byte
+
+	CustomRLPSerializeString() []string
+
+	CustomRLPSerializeBytes() []interface{}
 }
 
 type ProofDB struct {
@@ -73,7 +83,6 @@ func (w *ProofDB) Serialize() [][]byte {
 }
 
 func (w *ProofDB) CustomSerialize() [][]byte {
-
 	nodes := make([][]byte, 0, len(w.kv)*2)
 	for key, value := range w.kv {
 		keyBytes, _ := hex.DecodeString(key)
@@ -82,18 +91,111 @@ func (w *ProofDB) CustomSerialize() [][]byte {
 	return nodes
 }
 
+// func DeserializeProof(data [][]byte) (*ProofDB, error) {
+
+// }
+
+func (w *ProofDB) CustomRLPSerialize() [][]byte {
+	var serializedProof [][]byte
+	for _, value := range w.kv {
+		// decodedKey, _ := hex.DecodeString(key)
+		// serializedProof = append(serializedProof, decodedKey, value)
+		serializedProof = append(serializedProof, value)
+	}
+	return serializedProof
+}
+
 func DeserializeProof(data [][]byte) (*ProofDB, error) {
 	proofDB := NewProofDB()
-	for i := 0; i < len(data); i += 2 {
-		if i+1 >= len(data) {
-			return nil, fmt.Errorf("odd number of elements in serialized data, expected key-value pairs")
-		}
-		key := data[i]
-		value := data[i+1]
-		if err := proofDB.Put(key, value); err != nil {
+	log.Println("len(data): ", len(data))
+	for i := 0; i < len(data); i += 1 {
+		// if i+1 >= len(data) {
+		// 	return nil, fmt.Errorf("odd number of elements in serialized data, expected key-value pairs")
+		// }
+		// key := data[i]
+		key := Keccak256(data[i])
+		value := data[i]
+		log.Println("key: ", key, "value: ", value)
+		if err := proofDB.Put([]byte(key), value); err != nil {
 			return nil, fmt.Errorf("failed to put key-value pair in proof DB: %v", err)
 		}
 	}
+	return proofDB, nil
+}
+
+// the old one for []string
+func (w *ProofDB) CustomRLPSerializeString() []string {
+	var serializedProof []string
+
+	// Iterate over each TrieNode and convert its serialized content back to hex string
+	for _, node := range w.kv {
+		// Convert the serialized byte slice to a hex string
+		serializedHex := hex.EncodeToString(node)
+
+		// fmt.Println("serializedHex: ", serializedHex)
+		// Add the "0x" prefix to indicate hexadecimal format
+		serializedProof = append(serializedProof, "0x"+serializedHex)
+	}
+
+	return serializedProof
+}
+
+func (w *ProofDB) CustomRLPSerializeBytes() []interface{} {
+	var serializedProof [][]byte
+
+	for _, node := range w.kv {
+		serializedProof = append(serializedProof, node)
+	}
+
+	// return serializedProof
+
+	var proofAsInterface []interface{}
+	for _, proofNode := range serializedProof {
+		proofAsInterface = append(proofAsInterface, proofNode)
+	}
+
+	return proofAsInterface
+}
+
+// func SerializeProofNodes(nodes [][]byte) ([]string, error) {
+// 	var serializedProof []string
+
+// 	// Iterate over each TrieNode and convert its serialized content back to hex string
+// 	for _, node := range nodes {
+// 		// Convert the serialized byte slice to a hex string
+// 		serializedHex := hex.EncodeToString(node)
+
+// 		// Add the "0x" prefix to indicate hexadecimal format
+// 		serializedProof = append(serializedProof, "0x"+serializedHex)
+// 	}
+
+// 	return serializedProof, nil
+// }
+
+func DeserializeProofNodes(serializedProof []string) (*ProofDB, error) {
+	proofDB := NewProofDB()
+
+	// Iterate over each serialized hex string in the proof array
+	for _, hexNode := range serializedProof {
+		// Remove the "0x" prefix if present
+		if len(hexNode) > 1 && hexNode[:2] == "0x" {
+			hexNode = hexNode[2:]
+		}
+
+		// Decode the hex string into bytes
+		serializedBytes, err := hex.DecodeString(hexNode)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode hex string: %w", err)
+		}
+
+		// Calculate the keccak256 hash of the serialized node bytes (same as Solidity's keccak256)
+		nodeHash := crypto.Keccak256(serializedBytes)
+
+		// Create the TrieNode and store the hash and serialized content
+		proofDB.Put(nodeHash, serializedBytes)
+
+	}
+
 	return proofDB, nil
 }
 
@@ -152,3 +254,10 @@ func (t *Trie) Prove(key []byte) (Proof, bool) {
 func VerifyProof(rootHash []byte, key []byte, proof Proof) (value []byte, err error) {
 	return trie.VerifyProof(common.BytesToHash(rootHash), key, proof)
 }
+
+// func VerifySerializedProof(rootHash []byte, key []byte, proof []string) (value []byte, err error) {
+
+// 	deserializedProofNodes, _ := DeserializeProofNodes(proof)
+
+// 	return trie.VerifyProof(common.BytesToHash(rootHash), key, deserializedProofNodes)
+// }

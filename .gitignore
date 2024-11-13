@@ -1,1 +1,7 @@
 network/*
+.DS_Store
+.AppleDouble
+.LSOverride
+**/build/bin/
+
+
