@@ -13,7 +13,9 @@ import (
 func (m *Manager) AddClient(id string, conn *websocket.Conn) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	m.clientsMap[id] = mClient.New(id, conn)
+	client := mClient.New(id, conn)
+	m.clientsMap[id] = client
+	go client.WritePump() // Start the write pump goroutine
 }
 
 func (m *Manager) RemoveClient(id string) {
