@@ -2,6 +2,7 @@ package mpt
 
 import (
 	"fmt"
+	"log"
 )
 
 type Nibble byte
@@ -44,6 +45,7 @@ func FromBytes(bs []byte) []Nibble {
 	for _, b := range bs {
 		ns = append(ns, FromByte(b)...)
 	}
+	log.Println(ns)
 	return ns
 }
 

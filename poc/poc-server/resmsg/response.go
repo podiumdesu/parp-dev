@@ -1,11 +1,14 @@
 package resmsg
 
 import (
+	"encoding/hex"
 	"encoding/json"
+	"log"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 // type ServerMsg interface {
@@ -65,7 +68,7 @@ type ResponseBody struct {
 	SignedReqBody []byte
 	Proof         [][]byte
 	TxHash        common.Hash
-	TxIdx         uint32
+	TxIdx         []byte
 }
 type ResponseMsg struct {
 	Type               string
@@ -76,7 +79,7 @@ type ResponseMsg struct {
 	ReturnValue        []byte
 	Proof              [][]byte
 	TxHash             common.Hash
-	TxIdx              uint32
+	TxIdx              []byte
 	Signature          []byte
 }
 
@@ -86,9 +89,37 @@ func (rb *ResponseBody) HashBytes() []byte {
 	return hash.Bytes()
 }
 
+func (rb *ResponseBody) Keccak256Hash() common.Hash {
+	data := []byte{}
+
+	data = append(data, rb.SignedReqBody...)
+	data = append(data, rb.TxHash.Bytes()...)
+	data = append(data, rb.TxIdx...)
+
+	for _, proofItem := range rb.Proof {
+		data = append(data, []byte(proofItem)...) // Proof as bytes array
+	}
+	hash := crypto.Keccak256Hash(data)
+
+	return hash
+}
+
 func (r *ResponseMsg) Bytes() []byte {
 	jsonMsg, _ := json.Marshal(r)
 	return jsonMsg
+}
+
+func (r *ResponseMsg) RlpBytes() string {
+	// Encode the ResponseMsg to RLP bytes
+	serializedBytes, err := rlp.EncodeToBytes(r)
+	if err != nil {
+		log.Fatalf("Failed to RLP encode ResponseMsg: %v", err)
+	}
+
+	// Convert the serialized RLP bytes to a hex string, prefixed with "0x"
+	hexString := "0x" + hex.EncodeToString(serializedBytes)
+
+	return hexString
 }
 
 func (r *ResponseMsg) BodyHashBytes() []byte {
