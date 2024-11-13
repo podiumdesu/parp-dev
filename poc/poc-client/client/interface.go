@@ -23,7 +23,7 @@ type Client struct {
 	ConnectFN       common.Address
 	FeeStandards    int
 	Secret          *big.Int
-	ChannelID       *big.Int
+	ChannelID       []byte
 	StartTime       time.Time
 	Duration        time.Duration
 	Amount          uint

@@ -8,7 +8,7 @@ import (
 
 type Client struct {
 	Conn      *websocket.Conn
-	ChannelId string
+	ChannelId []byte
 	Send      chan []byte
 	Receive   chan []byte
 }

@@ -43,5 +43,5 @@ func main() {
 	http.HandleFunc("/ws/", handlers.HandleWebSocket(clientManager))
 	// http.HandleFunc("/", handlers.HomeHandler())
 
-	log.Fatal(http.ListenAndServe(":9999", nil))
+	log.Fatal(http.ListenAndServe(":8888", nil))
 }

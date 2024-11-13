@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"log"
 	"poc-server/resmsg"
+
+	"github.com/ethereum/go-ethereum/common"
 )
 
 func HandleInfoHex(msg []byte) error {
@@ -14,6 +15,6 @@ func HandleInfoHex(msg []byte) error {
 		log.Fatal(err)
 		return err
 	}
-	log.Println(hex.EncodeToString(serverMsg.Info))
+	log.Println(common.BytesToHash(serverMsg.Info))
 	return nil
 }

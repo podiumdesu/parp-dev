@@ -5,11 +5,19 @@ import (
 	"crypto/ecdsa"
 	"log"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
 func Sign(privateKey *ecdsa.PrivateKey, hashByte []byte) []byte {
 	sig, err := crypto.Sign(hashByte, privateKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return sig
+}
+func SignHash(privateKey *ecdsa.PrivateKey, hash common.Hash) []byte {
+	sig, err := crypto.Sign(hash[:], privateKey)
 	if err != nil {
 		log.Fatal(err)
 	}

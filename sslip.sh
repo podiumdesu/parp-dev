@@ -2,7 +2,7 @@
 
 GETH_DIR=./dependencies/geth-sslip
 
-( cd $GETH_DIR && make geth )
+#( cd $GETH_DIR && make geth )
 
 set -exu
 set -o pipefail

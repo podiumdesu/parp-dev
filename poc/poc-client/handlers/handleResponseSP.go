@@ -25,7 +25,10 @@ func HandleResponseSP(msg []byte, client *client.Client) error {
 	}
 	res := cryptoutil.Verify(crypto.FromECDSAPub(client.ServerPublicKey), resMsg.BodyHashBytes(), resMsg.Signature)
 	log.Println("Verify Response signature:", res)
-	proof, err := mpt.DeserializeProof(resMsg.Proof)
+	proof, _ := mpt.DeserializeProof(resMsg.Proof)
+	// txProofRLP, _ := mpt.VerifyProof(txRootHash[:], key, proof)
+
+	// proof, err := mpt.DeserializeProofNodes(resMsg.Proof)
 	if err != nil {
 		log.Println("Error deserializing proof: ", err)
 	}
