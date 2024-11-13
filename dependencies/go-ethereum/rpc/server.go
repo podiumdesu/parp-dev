@@ -18,10 +18,16 @@ package rpc
 
 import (
 	"context"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
 	"io"
+	"os"
+	"strings"
 	"sync"
 	"sync/atomic"
 
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 )
 
@@ -157,11 +163,132 @@ func (s *Server) serveSingleRequest(ctx context.Context, codec ServerCodec) {
 		}
 		return
 	}
+
+	// Extract and log metadata
+	peerInfo := PeerInfoFromContext(ctx)
+	for _, req := range reqs {
+		// Convert params to a readable JSON string
+		paramsStr, err := json.Marshal(req.Params)
+		if err != nil {
+			log.Error("Failed to marshal RPC params", "err", err)
+			continue
+		}
+
+		log.Info("Received RPC request",
+			"method", req.Method,
+			"params", string(paramsStr),
+			"from", peerInfo.RemoteAddr)
+
+		// Save to file
+		logToFile(peerInfo, req.Method, string(paramsStr))
+	}
+
 	if batch {
 		h.handleBatch(reqs)
 	} else {
 		h.handleMsg(reqs[0])
 	}
+}
+
+const (
+	colorRed   = "\033[31m"
+	colorReset = "\033[0m"
+)
+
+func decodeRawTransaction(rawTxHex string) (*types.Transaction, error) {
+	// Remove the "0x" prefix if it exists
+	log.Info("Decoding raw transaction-------")
+	log.Info(rawTxHex)
+	if len(rawTxHex) > 2 && rawTxHex[:2] == "0x" {
+		rawTxHex = rawTxHex[2:]
+	}
+
+	// Decode the hex string into bytes
+	rawTxBytes, err := hex.DecodeString(rawTxHex)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a new empty Transaction object
+	var tx types.Transaction
+
+	// Unmarshal the raw bytes into the Transaction object
+	if err := tx.UnmarshalBinary(rawTxBytes); err != nil {
+		return nil, err
+	}
+
+	return &tx, nil
+}
+
+func logToFile(peerInfo PeerInfo, method, params string) {
+	f, err := os.OpenFile("rpc_requests.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Error("Failed to open log file", "err", err)
+		return
+	}
+	defer f.Close()
+
+	const (
+		colorRed   = "\033[31m"
+		colorReset = "\033[0m"
+	)
+
+	methodConsole := method
+	methodFile := method
+	if method == "eth_getBalance" {
+		methodConsole = fmt.Sprintf("%s%s%s", colorRed, method, colorReset)
+		methodFile = fmt.Sprintf("*** %s ***", method)
+	}
+
+	if method == "eth_sendRawTransaction" {
+		log.Info("This is params")
+
+		cleanedParams := strings.Trim(params, `[]"`)
+		tx, err := decodeRawTransaction(cleanedParams)
+
+		if err != nil {
+			fmt.Printf("Failed to decode transaction: %v", err)
+		}
+
+		// Determine the signer
+		signer := types.LatestSignerForChainID(tx.ChainId())
+
+		// Recover the sender address
+		from, err := types.Sender(signer, tx)
+		if err != nil {
+			log.Error("Failed to recover sender: %v", err)
+		}
+
+		// Print out the transaction details
+		fmt.Println("Transaction details:")
+		fmt.Printf("Nonce: %d\n", tx.Nonce())
+		fmt.Printf("Gas Price: %s\n", tx.GasPrice().String())
+		fmt.Printf("Gas Limit: %d\n", tx.Gas())
+		fmt.Printf("To: %s\n", tx.To().Hex())
+		fmt.Printf("From: %s\n", from.Hex())
+		fmt.Printf("Value: %s\n", tx.Value().String())
+		fmt.Printf("Data: %x\n", tx.Data())
+	}
+
+	// Log entry for the file (with brief formatting)
+	logEntryFile := fmt.Sprintf(
+		"Received RPC request from %-15s; Method: %-30s Params: %-100s\n",
+		peerInfo.RemoteAddr, methodFile, params,
+	)
+
+	// Log entry for the console (with color codes)
+	logEntryConsole := fmt.Sprintf(
+		"Received RPC request from %-15s; Method: %-30s Params: %-100s\n",
+		peerInfo.RemoteAddr, methodConsole, params,
+	)
+
+	// Write the log entry to the file (with brief formatting)
+	if _, err := f.WriteString(logEntryFile); err != nil {
+		log.Error("Failed to write to log file", "err", err)
+	}
+
+	// Print the log entry to the console (with color if applicable)
+	fmt.Print(logEntryConsole)
 }
 
 // Stop stops reading new requests, waits for stopPendingRequestTimeout to allow pending
