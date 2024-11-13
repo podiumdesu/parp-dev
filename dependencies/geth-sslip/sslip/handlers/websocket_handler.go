@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -115,7 +116,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 			switch header {
 
 			case "HANDSHAKE":
-				log.Println("\n----------------HANDSHAKE from clientID ", clientID, "---------------------")
+				log.Println("----------------HANDSHAKE from clientID ", clientID, "---------------------")
 				log.Println("Recv HANDSHAKE from clientID ", clientID)
 
 				var hsMsg handshake.Msg
@@ -143,7 +144,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 				// log.Println("---------Connection with clientID ", clientID, " established---------")
 
 			case "SIG":
-				log.Println("\n----------------Request from clientID ", clientID, "---------------------")
+				log.Println("----------------Request from clientID ", clientID, "---------------------")
 
 				log.Println("Recv SIG from clientID ", clientID)
 
@@ -194,10 +195,14 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 				fmt.Println("------------------------------------------------------\n")
 
 			case "TX":
-				log.Println("\n----------------SignTx from clientID ", clientID, "---------------------")
+				log.Println("----------------SignTx from clientID ", clientID, "---------------------")
 
+				// 1. Unmarshal request body
 				var req request.RequestMsg
 				err := json.Unmarshal([]byte(body), &req)
+
+				// err := rlp.DecodeBytes([]byte(body), &req)
+
 				if err != nil {
 					log.Fatal("Unmarshal error: ", err)
 					break
@@ -206,9 +211,9 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 				log.Println("Request: ", string(jsonReq))
 
 				requestByte := req.ReqByte
-				log.Println(requestByte)
+				// log.Println(requestByte)
 
-				// verify the signature
+				// 2. Verify the signature
 				sigFlag := m.VerifyRequestWithSig(clientID, req)
 				var msg resmsg.ServerMsg
 				if sigFlag {
@@ -223,15 +228,15 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 						Info: []byte("SigCheck: WRONG signature"),
 					}
 				}
+				// Send the result of the signature check to the client
 				conn.WriteMessage(mt, msg.Bytes())
 
+				// 3. Send the tx to the network
 				wsEndpoint := "ws://localhost:8100"
 				client, err := ethclient.Dial(wsEndpoint)
 				if err != nil {
 					log.Fatal(err)
 				}
-
-				// // Send the tx to the network
 
 				txSend := new(types.Transaction)
 				rlp.DecodeBytes(requestByte, &txSend)
@@ -241,7 +246,8 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 					log.Fatal(err)
 				}
 
-				log.Println("tx submitted: %s", txSend.Hash().Hex())
+				log.Printf("tx submitted: %s", txSend.Hash().Hex())
+
 				msg = resmsg.ServerMsg{
 					Type: "info-hex",
 					Info: txSend.Hash().Bytes(),
@@ -297,31 +303,37 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 					}
 				}
 
+				// To delete later
+				proof, idx, txHash := FuncTestTransactionRootAndProof()
+				// ----end
+
 				// Generate the proof of the transaction
 				blockHash := txReceipt.BlockHash
 				block, _ := client.BlockByHash(context.Background(), blockHash)
 				blockNr := block.Number()
-				txHash := txReceipt.TxHash
+				// txHash := txReceipt.TxHash
 				txIndex := txReceipt.TransactionIndex
-				txRootHash := block.TxHash()
+				// txRootHash := block.TxHash()
+				// txRootHash := common.HexToHash("bb345e208bda953c908027a45aa443d6cab6b8d2fd64e83ec52f1008ddeafa58")
 
 				log.Println("Block Hash: ", blockHash.Hex())
-				log.Println("Tx Hash: ", txHash.Hex())
+				log.Println("Tx Hash: ", txHash)
 				log.Println("Tx Index: ", txIndex)
-				log.Println("TxRoot Hash: ", txRootHash)
+				// log.Println("TxRoot Hash: ", txRootHash)
 
-				proof, idx := generateProof(block, txHash)
+				// proof, idx := generateProof(block, txHash)
+
 				if err != nil {
 					log.Println("Error: ", err)
 				}
 
-				if proof == nil {
-					log.Println("Error: unable to generate the proof")
-				} else {
-					res := verifyProof(txHash, proof, blockNr, uint32(idx))
+				// if proof == nil {
+				// 	log.Println("Error: unable to generate the proof")
+				// } else {
+				// 	res := verifyProof(txHash, proof, blockNr, idx)
 
-					log.Println("Proof Verification: ", res)
-				}
+				// 	log.Println("Proof Verification: ", res)
+				// }
 				// serializedProof := proof.Serialize()
 				// var buffer bytes.Buffer
 				// for _, part := range serializedProof {
@@ -331,12 +343,19 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 				// Send the response to the client
 				responseBody := resmsg.ResponseBody{
 					SignedReqBody: req.SignedReqBody,
-					Proof:         proof.CustomSerialize(),
 					TxHash:        txHash,
-					TxIdx:         uint32(idx),
+					TxIdx:         idx,
+					Proof:         proof.CustomRLPSerialize(),
 				}
-				log.Println(proof)
-				sig := cryptoutil.Sign(m.PrivateKey, responseBody.HashBytes())
+				log.Println(proof.CustomRLPSerializeBytes())
+				log.Println("Response body keccak256 hash")
+				log.Println(idx)
+
+				log.Println(responseBody.Keccak256Hash())
+				sig := cryptoutil.SignHash(m.PrivateKey, responseBody.Keccak256Hash())
+
+				log.Println("SignedReqBody:", hex.EncodeToString(req.SignedReqBody))
+
 				responseMsg := resmsg.ResponseMsg{
 					Type:               "response",
 					ChannelId:          channelId,
@@ -344,16 +363,43 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 					SignedReqBody:      req.SignedReqBody,
 					CurrentBlockHeight: blockNr,
 					ReturnValue:        txReceipt.Bloom.Bytes(),
-					Proof:              proof.CustomSerialize(),
+					Proof:              proof.CustomRLPSerialize(),
 					TxHash:             txHash,
-					TxIdx:              uint32(idx),
+					TxIdx:              idx,
 					Signature:          sig,
 				}
 
-				log.Println(responseMsg)
+				// fmt.Println(responseMsg.Keccak256Hash())
+
+				fmt.Println("ResponseMsg:")
+				fmt.Println("-------------")
+
+				printResponseMsg(responseMsg)
+
+				fmt.Println("-=-=-=-=-= Now print request bytes -=-=-=-=-=-=")
+
+				// type ReqBody struct {
+				// 	ChannelID      int
+				// 	Amount         uint
+				// 	ReqByte        []byte
+				// 	LocalBlockHash common.Hash
+				// }
+
+				log.Println(responseMsg.RlpBytes())
+
+				// reqBody := request.ReqBody{
+				// 	// ChannelID:      req.ChannelID,
+				// 	Amount:         req.Amount,
+				// 	LocalBlockHash: req.LocalBlockHash,
+				// 	ReqByte:        req.ReqByte,
+				// }
+
+				// reqBodyBytesString := reqBody.RlpBytes()
+				// log.Println("Submit to chain: ", reqBodyBytesString)
+
 				_ = conn.WriteMessage(mt, responseMsg.Bytes())
 
-				fmt.Println("------------------------------------------------------\n")
+				fmt.Println("------------------------------------------------------")
 
 			case "REQ":
 				var req request.RequestMsg
@@ -411,7 +457,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 				log.Println("Block number: ", blockHeader.Number.Text(16))
 
 				channelId := m.GetClientChannelID(clientID)
-				blockHeader, _ = wsClient.HeaderByNumber(context.Background(), blockHeader.Number)
+				blockHeader, _ = wsClient.HeaderByNumber(context.Background(), big.NewInt(168))
 
 				currentBlockHeader, _ := wsClient.HeaderByNumber(context.Background(), nil)
 
@@ -426,7 +472,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 
 				responseSPBody := resmsg.ResponseSPBody{
 					SignedReqBody: req.SignedReqBody,
-					Proof:         storageProof.CustomSerialize(),
+					Proof:         storageProof.CustomRLPSerialize(),
 					Address:       common.HexToAddress(m.ContractAddress),
 					BlockNr:       blockHeader.Number,
 				}
@@ -439,7 +485,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 					SignedReqBody:      req.SignedReqBody,
 					CurrentBlockHeight: currentBlockHeader.Number,
 					ReturnValue:        []byte(validState),
-					Proof:              storageProof.CustomSerialize(),
+					Proof:              storageProof.CustomRLPSerialize(),
 					Address:            common.HexToAddress(m.ContractAddress),
 					BlockNr:            blockHeader.Number,
 					Signature:          sig,
@@ -486,6 +532,46 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 		m.RemoveClient(clientID)
 		m.PrintClientsMap()
 	}
+}
+
+func printResponseMsg(msg resmsg.ResponseMsg) {
+	fmt.Println("ResponseMsg:")
+	fmt.Println("-------------")
+
+	// Print the Type
+	fmt.Printf("Type: %s\n", msg.Type)
+
+	// Print the ChannelId (as a hexadecimal string for readability)
+	fmt.Printf("ChannelId: %s\n", "0x"+hex.EncodeToString(msg.ChannelId[:]))
+
+	// Print the Amount
+	fmt.Printf("Amount: %d\n", msg.Amount)
+
+	// Print the SignedReqBody
+	fmt.Printf("SignedReqBody: %s\n", string(msg.SignedReqBody))
+
+	// Print the CurrentBlockHeight
+	fmt.Printf("CurrentBlockHeight: %d\n", msg.CurrentBlockHeight)
+
+	// Print the ReturnValue
+	fmt.Printf("ReturnValue: %s\n", string(msg.ReturnValue))
+
+	// Print the Proof array
+	fmt.Println("Proof:")
+	for i, proof := range msg.Proof {
+		fmt.Printf("  Proof[%d]: %s\n", i, proof)
+	}
+
+	// Print the TxHash (as a hexadecimal string for readability)
+	fmt.Printf("TxHash: %s\n", "0x"+hex.EncodeToString(msg.TxHash[:]))
+
+	// Print the TxIdx
+	fmt.Printf("TxIdx: %d\n", msg.TxIdx)
+
+	// Print the Signature
+	fmt.Printf("Signature: %s\n", string(msg.Signature))
+
+	fmt.Println()
 }
 
 func fromEthTransaction(t *types.Transaction) *mpt.Transaction {
@@ -538,7 +624,7 @@ func trieWithBlockTxs(txs []*types.Transaction, txRootHash common.Hash, txHash c
 	fmt.Println(rlp)
 }
 
-func generateProof(block *types.Block, txHash common.Hash) (mpt.Proof, int) {
+func generateProof(block *types.Block, txHash common.Hash) (mpt.Proof, []byte) {
 	txs := block.Transactions()
 	idx := -1
 	for index, tx := range txs {
@@ -547,7 +633,7 @@ func generateProof(block *types.Block, txHash common.Hash) (mpt.Proof, int) {
 		}
 	}
 	if idx < 0 {
-		return nil, -1
+		return nil, nil
 	}
 
 	mptTrie := mpt.NewTrie()
@@ -568,10 +654,11 @@ func generateProof(block *types.Block, txHash common.Hash) (mpt.Proof, int) {
 	log.Println("proofSize: ", proofSize)
 
 	fmt.Printf("proof: %x, found: %v\n", proof, found)
-	return proof, idx
+
+	return proof, key
 }
 
-func verifyProof(txHash common.Hash, proof mpt.Proof, blockNr *big.Int, idx uint32) bool {
+func verifyProof(txHash common.Hash, proof mpt.Proof, blockNr *big.Int, key []byte) bool {
 	wsEndpoint := "ws://localhost:8100"
 	client, err := ethclient.Dial(wsEndpoint)
 	if err != nil {
@@ -582,7 +669,6 @@ func verifyProof(txHash common.Hash, proof mpt.Proof, blockNr *big.Int, idx uint
 	txRootHash := block.TxHash
 	tx, _, _ := client.TransactionByHash(context.Background(), txHash)
 	txRLP, _ := rlp.EncodeToBytes(tx)
-	key, _ := rlp.EncodeToBytes(uint32(idx))
 	txProofRLP, _ := mpt.VerifyProof(txRootHash[:], key, proof)
 	log.Println("txProofRLP: ", txProofRLP)
 	log.Println("txRLP: ", txRLP)

@@ -11,15 +11,15 @@ func (m *Manager) VerifyRequestWithSig(cID string, req request.RequestMsg) bool 
 	// Have to verify both signatures
 
 	requestBody := request.ReqBody{
-		ChannelID:      req.ChannelID,
+		// ChannelID:      req.ChannelID,
 		Amount:         req.Amount,
-		ReqByte:        req.ReqByte,
 		LocalBlockHash: req.LocalBlockHash,
+		ReqByte:        req.ReqByte,
 	}
 
 	paymentBody := request.PaymentBody{
-		ChannelID: req.ChannelID,
-		Amount:    req.Amount,
+		// ChannelID: req.ChannelID,
+		Amount: req.Amount,
 	}
 
 	reqBSig := req.SignedReqBody
@@ -34,7 +34,7 @@ func (m *Manager) VerifyRequestWithSig(cID string, req request.RequestMsg) bool 
 	}
 
 	pubKB := m.GetClient(cID).PubKeyB
-	rbFlag := cryptoutil.Verify(pubKB, requestBody.PreHashByte(), req.SignedReqBody)
+	rbFlag := cryptoutil.Verify(pubKB, requestBody.Keccak256Hash().Bytes(), req.SignedReqBody)
 	pbFlag := cryptoutil.Verify(pubKB, paymentBody.PreHashByte(), req.SignedPaymentBody)
 	log.Println("rbFlag: ", rbFlag, " pbFlag: ", pbFlag)
 	return rbFlag && pbFlag
