@@ -181,7 +181,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 
 				log.Println("body: ", string(body))
 
-				sigFlag := m.VerifyRequestWithSig(clientID, req)
+				sigFlag, _ := m.VerifyRequestWithSig(clientID, req)
 				var msg resmsg.ServerMsg
 				if sigFlag {
 					log.Println("PASS: Signature verified")
@@ -218,7 +218,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 				// log.Println(requestByte)
 
 				// 2. Verify the signature
-				sigFlag := m.VerifyRequestWithSig(clientID, req)
+				sigFlag, reqHash := m.VerifyRequestWithSig(clientID, req)
 				var msg resmsg.ServerMsg
 				if sigFlag {
 					log.Println("PASS: Signature verified")
@@ -381,6 +381,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 
 				printResponseMsg(responseMsg)
 
+				log.Println("reqHash: ", reqHash)
 				fmt.Println("-=-=-=-=-= Now print request bytes -=-=-=-=-=-=")
 
 				// type ReqBody struct {
@@ -419,7 +420,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 
 				// Verify the signature
 
-				sigFlag := m.VerifyRequestWithSig(clientID, req)
+				sigFlag, _ := m.VerifyRequestWithSig(clientID, req)
 				var msg resmsg.ServerMsg
 				if sigFlag {
 					log.Println("PASS: Signature verified")

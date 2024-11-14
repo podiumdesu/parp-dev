@@ -3,11 +3,12 @@ package manager
 import (
 	"log"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/poc-client/msg/request"
 	"github.com/ethereum/go-ethereum/poc-client/utils/cryptoutil"
 )
 
-func (m *Manager) VerifyRequestWithSig(cID string, req request.RequestMsg) bool {
+func (m *Manager) VerifyRequestWithSig(cID string, req request.RequestMsg) (bool, common.Hash) {
 	// Have to verify both signatures
 
 	requestBody := request.ReqBody{
@@ -16,6 +17,8 @@ func (m *Manager) VerifyRequestWithSig(cID string, req request.RequestMsg) bool 
 		LocalBlockHash: req.LocalBlockHash,
 		ReqByte:        req.ReqByte,
 	}
+
+	reqBodyHash := requestBody.Keccak256Hash()
 
 	paymentBody := request.PaymentBody{
 		// ChannelID: req.ChannelID,
@@ -37,5 +40,5 @@ func (m *Manager) VerifyRequestWithSig(cID string, req request.RequestMsg) bool 
 	rbFlag := cryptoutil.Verify(pubKB, requestBody.Keccak256Hash().Bytes(), req.SignedReqBody)
 	pbFlag := cryptoutil.Verify(pubKB, paymentBody.PreHashByte(), req.SignedPaymentBody)
 	log.Println("rbFlag: ", rbFlag, " pbFlag: ", pbFlag)
-	return rbFlag && pbFlag
+	return rbFlag && pbFlag, reqBodyHash
 }
