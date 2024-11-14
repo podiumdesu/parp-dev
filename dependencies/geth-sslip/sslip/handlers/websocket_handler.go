@@ -365,6 +365,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 					Type:               "response",
 					ChannelId:          channelId,
 					Amount:             req.Amount,
+					ReqBodyHash:        reqHash,
 					SignedReqBody:      req.SignedReqBody,
 					CurrentBlockHeight: blockNr,
 					ReturnValue:        txReceipt.Bloom.Bytes(),
@@ -381,6 +382,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 
 				printResponseMsg(responseMsg)
 
+				log.Println("resHash: ", responseBody.Keccak256Hash())
 				log.Println("reqHash: ", reqHash)
 				fmt.Println("-=-=-=-=-= Now print request bytes -=-=-=-=-=-=")
 

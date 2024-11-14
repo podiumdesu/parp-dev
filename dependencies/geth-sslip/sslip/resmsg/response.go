@@ -21,6 +21,7 @@ type ResponseMsg struct {
 	Type               string
 	ChannelId          common.Hash
 	Amount             uint
+	ReqBodyHash        common.Hash
 	SignedReqBody      []byte
 	CurrentBlockHeight *big.Int
 	ReturnValue        []byte
