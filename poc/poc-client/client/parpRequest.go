@@ -39,10 +39,6 @@ func (c *Client) generateParpRequest(ch uint32, amount uint, reqByte []byte, blo
 
 	signedPayBody := c.Sign(paymentBody.PreHashByte())
 
-	// log.Println("_--------")
-	// log.Println(hex.EncodeToString(paymentBody.PreHashByte()))
-	// log.Println(hex.EncodeToString(signedPayBody))
-	// log.Println("_--------")
 	request := request.RequestMsg{
 		// ChannelID:         ch,
 		Type:              0,
@@ -56,7 +52,6 @@ func (c *Client) generateParpRequest(ch uint32, amount uint, reqByte []byte, blo
 	c.Amount = amount
 
 	jsonRequest, err := json.Marshal(request)
-	// jsonRequest, err := rlp.EncodeToBytes(request)
 	if err != nil {
 		log.Println(err)
 	}
