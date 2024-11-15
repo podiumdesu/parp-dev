@@ -51,7 +51,6 @@ func (c *Client) createOpenChanTx() ([]byte, error) {
 	openChanSignTx := protocol.OpenChanTx(bcClient, c.PrivateKey, fnAddr, deposit, common.HexToAddress(c.ContractAddress))
 
 	msg := c.generateParpRequest(20, c.Amount+100, openChanSignTx, blockHeader.Hash())
-
 	c.Amount += 100 // record the payment amount
 	msgWType := append([]byte("TX:"), msg...)
 

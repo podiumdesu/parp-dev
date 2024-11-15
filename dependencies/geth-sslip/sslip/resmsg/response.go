@@ -41,16 +41,23 @@ func (r *ResponseMsg) Bytes() []byte {
 
 func (rb *ResponseBody) Keccak256Hash() common.Hash {
 	data := []byte{}
-
 	data = append(data, rb.SignedReqBody...)
-	data = append(data, rb.TxHash.Bytes()...)
-	data = append(data, rb.TxIdx...)
 
 	for _, proofItem := range rb.Proof {
 		data = append(data, []byte(proofItem)...) // Proof as bytes array
 	}
+	data = append(data, rb.TxHash.Bytes()...)
+	data = append(data, rb.TxIdx...)
+
 	hash := crypto.Keccak256Hash(data)
 
+	// log.Println("----------------------NOW I WANT TO CHECK THE HASH!!!!----------------------")
+	// log.Println(rb.Proof)
+	// log.Println(rb.TxHash)
+	// log.Println(rb.TxIdx)
+	// log.Println(data)
+
+	// log.Println("----------------------END!----------------------")
 	return hash
 }
 
@@ -69,10 +76,10 @@ func (r *ResponseMsg) RlpBytes() string {
 
 func (r *ResponseMsg) BodyHashBytes() []byte {
 	data := ResponseBody{
-		SignedReqBody: r.SignedReqBody,
-		Proof:         r.Proof,
-		TxHash:        r.TxHash,
-		TxIdx:         r.TxIdx,
+		// SignedReqBody: r.SignedReqBody,
+		// Proof:  r.Proof,
+		TxHash: r.TxHash,
+		TxIdx:  r.TxIdx,
 	}
 	return hashData(data)
 }

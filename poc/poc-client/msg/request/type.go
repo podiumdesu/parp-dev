@@ -84,9 +84,6 @@ func (rb *ReqBody) Keccak256Hash() common.Hash {
 	data = append(data, rb.ReqByte...)
 
 	hash := crypto.Keccak256Hash(data)
-
-	log.Println("Request message Hash: ", hash)
-
 	return hash
 }
 
@@ -114,9 +111,8 @@ func (pb *PaymentBody) HashByte() []byte {
 }
 
 func (pb *PaymentBody) PreHashByte() []byte {
-	log.Println("----------PB----")
 
-	log.Printf("%x", pb.HashByte())
+	// log.Printf("%x", pb.HashByte())
 	// prefixed hash for ethereum signautre message
 	return GeneratePrefixedHash(pb.HashByte())
 }

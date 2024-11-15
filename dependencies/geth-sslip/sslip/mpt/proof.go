@@ -3,7 +3,6 @@ package mpt
 import (
 	"encoding/hex"
 	"fmt"
-	"log"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -50,7 +49,7 @@ func NewProofDB() *ProofDB {
 func (w *ProofDB) Put(key []byte, value []byte) error {
 	keyS := fmt.Sprintf("%x", key)
 	w.kv[keyS] = value
-	fmt.Printf("put key: %x, value: %x\n", key, value)
+	// fmt.Printf("put key: %x, value: %x\n", key, value)
 	return nil
 }
 
@@ -107,7 +106,7 @@ func (w *ProofDB) CustomRLPSerialize() [][]byte {
 
 func DeserializeProof(data [][]byte) (*ProofDB, error) {
 	proofDB := NewProofDB()
-	log.Println("len(data): ", len(data))
+	// log.Println("len(data): ", len(data))
 	for i := 0; i < len(data); i += 1 {
 		// if i+1 >= len(data) {
 		// 	return nil, fmt.Errorf("odd number of elements in serialized data, expected key-value pairs")
@@ -115,7 +114,7 @@ func DeserializeProof(data [][]byte) (*ProofDB, error) {
 		// key := data[i]
 		key := Keccak256(data[i])
 		value := data[i]
-		log.Println("key: ", key, "value: ", value)
+		// log.Println("key: ", key, "value: ", value)
 		if err := proofDB.Put([]byte(key), value); err != nil {
 			return nil, fmt.Errorf("failed to put key-value pair in proof DB: %v", err)
 		}
