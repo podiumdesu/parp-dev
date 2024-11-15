@@ -17,11 +17,16 @@ func Sign(privateKey *ecdsa.PrivateKey, hashByte []byte) []byte {
 	return sig
 }
 func SignHash(privateKey *ecdsa.PrivateKey, hash common.Hash) []byte {
-	sig, err := crypto.Sign(hash[:], privateKey)
+	signature, err := crypto.Sign(hash[:], privateKey)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return sig
+	// Adjust v value, Ethereum uses 27 or 28
+	if signature[64] != 27 && signature[64] != 28 {
+		signature[64] += 27
+	}
+
+	return signature
 }
 
 func Verify(pubKeyByte []byte, hashByte []byte, sig []byte) bool {
