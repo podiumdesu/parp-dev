@@ -41,11 +41,6 @@ func (c *Client) createOpenChanTx() ([]byte, error) {
 		return nil, err
 	}
 
-	log.Println("Block Hash: ", blockHeader.Hash().Hex())
-
-	// log.Println("\n------------------Send OpenChan request--------------------")
-	// TODO: Forgot why it is arbitrary here, need to revise it
-
 	fnAddr := common.HexToAddress("0xA2131E7503F7Dd11ff5dAAC09fa7c301e7Fe0f30")
 	deposit := big.NewInt(200000)
 	openChanSignTx := protocol.OpenChanTx(bcClient, c.PrivateKey, fnAddr, deposit, common.HexToAddress(c.ContractAddress))

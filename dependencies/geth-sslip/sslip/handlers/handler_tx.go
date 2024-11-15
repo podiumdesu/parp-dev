@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
@@ -27,46 +26,16 @@ func handler_tx(clientID string, body string, m *manager.Manager, conn *websocke
 
 	client := m.GetClient(clientID)
 
-	log.Println("----------------SignTx from clientID ", clientID, "---------------------")
-
-	// 1. Unmarshal request body
-	var req request.RequestMsg
-	err := json.Unmarshal([]byte(body), &req)
-
-	// err := rlp.DecodeBytes([]byte(body), &req)
-	if err != nil {
-		log.Fatal("Unmarshal error: ", err)
-		return err
-	}
-	jsonReq, _ := json.Marshal(req)
-	log.Println("Request: ", string(jsonReq))
-
+	req, _ := unmarshalRequest(body)
 	requestByte := req.ReqByte
-	// log.Println(requestByte)
 
-	// 2. Verify the signature
-	log.Println("SignedReqBody after verification:", hex.EncodeToString(req.SignedReqBody))
-
-	sigFlag, reqHash := m.VerifyRequestWithSig(clientID, req)
-	log.Println("SignedReqBody after verification:", hex.EncodeToString(req.SignedReqBody))
-	var msg resmsg.ServerMsg
-	if sigFlag {
-		log.Println("PASS: Signature verified")
-		msg = resmsg.ServerMsg{
-			Type: "info",
-			Info: []byte("SigCheck: Passed"),
-		}
-	} else {
-		msg = resmsg.ServerMsg{
-			Type: "info",
-			Info: []byte("SigCheck: WRONG signature"),
-		}
-	}
-
-	log.Println("*************************Pre check passed!*************************")
+	log.Println("----------------SignTx from clientID ", clientID, "---------------------")
+	_, reqHash, sigCheckMsg, err := verifyReqSignature(m, clientID, req)
 
 	// Send the result of the signature check to the client
-	conn.WriteMessage(mt, msg.Bytes())
+	conn.WriteMessage(mt, sigCheckMsg.Bytes())
+
+	log.Println("*************************Pre check passed!*************************")
 
 	// 3. Send the tx to the network
 	wsEndpoint := "ws://localhost:8100"
@@ -86,7 +55,7 @@ func handler_tx(clientID string, body string, m *manager.Manager, conn *websocke
 	log.Println()
 	log.Printf("----------------Submited Tx: %s--------------------", txSend.Hash().Hex())
 
-	msg = resmsg.ServerMsg{
+	msg := resmsg.ServerMsg{
 		Type: "info-hex",
 		Info: txSend.Hash().Bytes(),
 	}
