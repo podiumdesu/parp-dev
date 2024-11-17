@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -10,55 +11,35 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/poc-client/msg/request"
 	"github.com/ethereum/go-ethereum/poc-client/utils/cryptoutil"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/sslip/manager"
 	"github.com/ethereum/go-ethereum/sslip/mpt"
 	"github.com/ethereum/go-ethereum/sslip/resmsg"
+	"github.com/gorilla/websocket"
 )
 
-func handler_req(clientID string, body string, m *manager.Manager) error {
+func handler_req(clientID string, body string, m *manager.Manager, conn *websocket.Conn, mt int) error {
 	client := m.GetClient(clientID)
 
-	var req request.RequestMsg
-	err := json.Unmarshal([]byte(body), &req)
+	req, _ := unmarshalRequest(body)
+	// requestByte := req.ReqByte
+
+	log.Println("----------------Request from clientID ", clientID, "---------------------")
+	_, reqHash, sigCheckMsg, err := verifyReqSignature(m, clientID, req)
+
 	if err != nil {
 		log.Fatal("Unmarshal error: ", err)
 		return err
 	}
-	jsonReq, _ := json.Marshal(req)
-	log.Println("Request: ", string(jsonReq))
-	log.Println(string(req.ReqByte))
 
-	// Verify the signature
+	// Send the result of the signature check to the client
+	conn.WriteMessage(mt, sigCheckMsg.Bytes())
 
-	sigFlag, _ := m.VerifyRequestWithSig(clientID, req)
-	var msg resmsg.ServerMsg
-	if sigFlag {
-		log.Println("PASS: Signature verified")
-		msg = resmsg.ServerMsg{
-			Type: "info",
-			Info: []byte("SigCheck: Passed"),
-		}
-	} else {
-		msg = resmsg.ServerMsg{
-			Type: "info",
-			Info: []byte("SigCheck: WRONG signature"),
-		}
-	}
-	client.Send(msg.Bytes())
+	log.Println("*************************Pre check passed!*************************")
 
-	log.Println("------------Pre check passed!----------")
-
-	wsEndpoint := "ws://localhost:8100"
-	wsClient, err := ethclient.Dial(wsEndpoint)
-	// rpcClient, _ := rpc.Dial("http://localhost:8000")
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
+	bcClient, _ := client.ConnectToBlockchain()
 
 	var balanceRequest request.JSONRPCRequest
 	err = json.Unmarshal(req.ReqByte, &balanceRequest)
@@ -67,63 +48,101 @@ func handler_req(clientID string, body string, m *manager.Manager) error {
 		return err
 	}
 
+	log.Println()
+	log.Printf("----------------Process the request--------------------")
+
 	params := balanceRequest.Params
 	log.Println(params[0])
 	address := common.HexToAddress(params[0].(string))
 
-	balance, err := wsClient.BalanceAt(context.Background(), address, nil)
+	balance, err := bcClient.BalanceAt(context.Background(), address, nil)
 	balanceInEther := new(big.Float).Quo(new(big.Float).SetInt(balance), big.NewFloat(math.Pow10(18)))
 
 	// Print the balance in Ether
 	fmt.Printf("Balance of %s: %s ETH\n", address.Hex(), balanceInEther.Text('f', 18)) // formatted to 18 decimal places
 
-	blockHeader, _ := wsClient.HeaderByNumber(context.Background(), nil)
-	log.Println("Block number: ", blockHeader.Number.Text(16))
+	// blockHeader, _ := bcClient.HeaderByNumber(context.Background(), nil)
+	currentBlockHeader, _ := bcClient.HeaderByNumber(context.Background(), nil)
+	log.Println("Block number: ", currentBlockHeader.Number.Text(16))
 
 	channelId := m.GetClientChannelID(clientID)
-	blockHeader, _ = wsClient.HeaderByNumber(context.Background(), big.NewInt(168))
-
-	currentBlockHeader, _ := wsClient.HeaderByNumber(context.Background(), nil)
+	// blockHeader, _ = bcClient.HeaderByNumber(context.Background(), big.NewInt(168))
 
 	channelIdBytes := common.HexToHash(channelId).Bytes()
 	var position [32]byte
 	data := append(channelIdBytes, position[:]...)
 	slot := crypto.Keccak256Hash(data)
-	storageProof := generateStorageProof(m.ContractAddress, slot.Hex(), blockHeader.Number)
 
-	res, validState := verifyStorageProof(storageProof, m.ContractAddress, blockHeader.Root)
-	log.Println(res, validState)
+	log.Println()
+	log.Printf("----------------Generate Storage Proof--------------------")
+
+	storageProof := generateStorageProof(m.ContractAddress, slot.Hex(), currentBlockHeader.Number)
+
+	log.Println("*************************Generation end!*************************")
+
+	log.Println()
+	log.Printf("----------------Verifying Proof--------------------")
+
+	res, validState := verifyStorageProof(storageProof, m.ContractAddress, currentBlockHeader.Root)
+	log.Println(res)
+
+	log.Println("*************************Generation & Verification DONE!*************************")
+
+	log.Println()
+	log.Printf("----------------Generate Response--------------------")
 
 	responseSPBody := resmsg.ResponseSPBody{
 		SignedReqBody: req.SignedReqBody,
 		Proof:         storageProof.CustomRLPSerialize(),
-		Address:       common.HexToAddress(m.ContractAddress),
-		BlockNr:       blockHeader.Number,
+		// Address:       common.HexToAddress(m.ContractAddress),
+		// BlockNr: currentBlockHeader.Number,
 	}
 
-	sig := cryptoutil.Sign(m.PrivateKey, responseSPBody.HashBytes())
+	sig := cryptoutil.SignHash(m.PrivateKey, responseSPBody.Keccak256Hash())
 	responseSPMsg := resmsg.ResponseSPMsg{
 		Type:               "responseSP",
 		ChannelId:          common.HexToHash(channelId),
 		Amount:             req.Amount,
+		ReqBodyHash:        reqHash,
 		SignedReqBody:      req.SignedReqBody,
 		CurrentBlockHeight: currentBlockHeader.Number,
 		ReturnValue:        []byte(validState),
 		Proof:              storageProof.CustomRLPSerialize(),
 		Address:            common.HexToAddress(m.ContractAddress),
-		BlockNr:            blockHeader.Number,
-		Signature:          sig,
+		// BlockNr:            currentBlockHeader.Number,
+		Signature: sig,
 	}
 
-	log.Println(responseSPMsg)
-	client.Send(responseSPMsg.Bytes())
+	// log.Println(responseSPMsg)
+	// client.Send(responseSPMsg.Bytes())
 
-	fmt.Println("------------------------------------------------------\n")
+	log.Println("SignedReqBody:", hex.EncodeToString(req.SignedReqBody))
+	log.Println("Signature:", hex.EncodeToString(sig))
+	log.Println("resHash: ", responseSPBody.Keccak256Hash())
+	log.Println("reqHash: ", reqHash)
+
+	fmt.Println("-=-=-=-=-= Now print response message bytes -=-=-=-=-=-=")
+	log.Println(responseSPMsg.RlpBytes())
+
+	fmt.Println("*********************************************************************")
+
+	reqBody := request.ReqBody{
+		// ChannelID:      req.ChannelID,
+		Amount:         req.Amount,
+		LocalBlockHash: req.LocalBlockHash,
+		ReqByte:        req.ReqByte,
+	}
+	reqBodyBytesString := reqBody.RlpBytes()
+	log.Println(reqBodyBytesString)
+
+	fmt.Println("*********************************************************************")
+
+	_ = conn.WriteMessage(mt, responseSPMsg.Bytes())
 
 	// storageKeys := []string{"0x0"} // Example storage key
 	// blockNumber := big.NewInt(blockHeader.Number.Int64())
 
-	// proofResponse := wsClient.Client().CallContext(context.Background(), nil, "eth_getProof", address, []string{"0x0"}, "0x2EE")
+	// proofResponse := bcClient.Client().CallContext(context.Background(), nil, "eth_getProof", address, []string{"0x0"}, "0x2EE")
 	// log.Println(proofResponse)
 	// GetProof(context.Background(), address, blockNumber, storageKeys)
 

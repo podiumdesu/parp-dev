@@ -28,9 +28,11 @@ func (c *Client) Start(hubSend chan<- []byte) {
 
 	wg.Wait()
 
-	wg.Add(1)
-	go c.sendOpenChanTx(&wg, hubSend)
+	// wg.Add(1)
+	// go c.sendOpenChanTx(&wg, hubSend)
 
+	wg.Add(1)
+	go c.SendBalanceCheckRequest(&wg, hubSend)
 }
 
 func (c *Client) ConnectToBlockchain() (*ethclient.Client, error) {

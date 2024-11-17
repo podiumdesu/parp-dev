@@ -196,7 +196,7 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 				handler_tx(clientID, body, m, conn, mt)
 
 			case "REQ":
-				handler_req(clientID, body, m)
+				handler_req(clientID, body, m, conn, mt)
 			default:
 
 				log.Println("\n----------------Message from clientID ", clientID, "---------------------")
