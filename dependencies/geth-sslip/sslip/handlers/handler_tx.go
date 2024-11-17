@@ -12,7 +12,6 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/poc-client/msg/request"
 	"github.com/ethereum/go-ethereum/poc-client/utils/cryptoutil"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -31,6 +30,10 @@ func handler_tx(clientID string, body string, m *manager.Manager, conn *websocke
 
 	log.Println("----------------SignTx from clientID ", clientID, "---------------------")
 	_, reqHash, sigCheckMsg, err := verifyReqSignature(m, clientID, req)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
 
 	// Send the result of the signature check to the client
 	conn.WriteMessage(mt, sigCheckMsg.Bytes())
@@ -38,11 +41,8 @@ func handler_tx(clientID string, body string, m *manager.Manager, conn *websocke
 	log.Println("*************************Pre check passed!*************************")
 
 	// 3. Send the tx to the network
-	wsEndpoint := "ws://localhost:8100"
-	bcClient, err := ethclient.Dial(wsEndpoint)
-	if err != nil {
-		log.Fatal(err)
-	}
+
+	bcClient, _ := client.ConnectToBlockchain()
 
 	txSend := new(types.Transaction)
 	rlp.DecodeBytes(requestByte, &txSend)

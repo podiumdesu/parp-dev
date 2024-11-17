@@ -3,6 +3,7 @@ package mClient
 import (
 	"log"
 
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gorilla/websocket"
 )
 
@@ -22,6 +23,10 @@ func New(id string, conn *websocket.Conn) *Client {
 		ChannelID: "",
 		WriteChan: make(chan []byte, 256), // Buffered channel to avoid blocking
 	}
+}
+
+func (c *Client) ConnectToBlockchain() (*ethclient.Client, error) {
+	return ethclient.Dial("ws://127.0.0.1:8101")
 }
 
 func (c *Client) WritePump() {
