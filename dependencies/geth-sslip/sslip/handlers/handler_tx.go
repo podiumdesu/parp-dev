@@ -160,9 +160,9 @@ func handler_tx(clientID string, body string, m *manager.Manager, conn *websocke
 	// fmt.Println("*********************************************************************")
 	// -----end
 
-	// log.Println("-=-=-=-=-=-= Now print request payment bytes -=-=-=-=-=-=")
-	// log.Println("Payment body byte: ", req.PaymentBodyRlpBytes())
-	// log.Println("*********************************************************************")
+	log.Println("-=-=-=-=-=-= Now print request payment bytes -=-=-=-=-=-=")
+	log.Println("Payment body byte: ", req.PaymentBodyRlpBytes())
+	log.Println("*********************************************************************")
 
 	_ = conn.WriteMessage(mt, responseMsg.Bytes())
 
