@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"log"
 
@@ -13,11 +12,8 @@ import (
 
 func verifyReqSignature(m *manager.Manager, clientID string, req request.RequestMsg) (bool, common.Hash, resmsg.ServerMsg, error) {
 
-	// 2. Verify the signature
-	log.Println("SignedReqBody after verification:", hex.EncodeToString(req.SignedReqBody))
-
 	sigFlag, reqHash := m.VerifyRequestWithSig(clientID, req)
-	log.Println("SignedReqBody after verification:", hex.EncodeToString(req.SignedReqBody))
+	// log.Println("SignedReqBody after verification:", hex.EncodeToString(req.SignedReqBody))
 
 	var msg resmsg.ServerMsg
 	if sigFlag {

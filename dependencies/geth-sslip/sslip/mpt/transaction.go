@@ -4,6 +4,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -23,4 +24,19 @@ type Transaction struct {
 
 func (t Transaction) GetRLP() ([]byte, error) {
 	return rlp.EncodeToBytes(t)
+}
+
+func FromEthTransaction(t *types.Transaction) *Transaction {
+	v, r, s := t.RawSignatureValues()
+	return &Transaction{
+		AccountNonce: t.Nonce(),
+		Price:        t.GasPrice(),
+		GasLimit:     t.Gas(),
+		Recipient:    t.To(),
+		Amount:       t.Value(),
+		Payload:      t.Data(),
+		V:            v,
+		R:            r,
+		S:            s,
+	}
 }

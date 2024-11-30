@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"sync"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	mClient "github.com/ethereum/go-ethereum/sslip/clients"
 
@@ -23,7 +24,7 @@ type ClientManager interface {
 	RemoveClient(id string)
 	GetClient(id string) *mClient.Client
 	SetClientPubK(id string, pubK []byte)
-	SetClientChannel(id string, channelID string)
+	SetClientChannel(id string, channelID common.Hash)
 	PrintClientsMap()
 }
 

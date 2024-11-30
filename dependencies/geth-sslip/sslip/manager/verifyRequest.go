@@ -11,20 +11,21 @@ import (
 func (m *Manager) VerifyRequestWithSig(cID string, req request.RequestMsg) (bool, common.Hash) {
 	// Have to verify both signatures
 
-	requestBody := request.ReqBody{
-		// ChannelID:      req.ChannelID,
-		Amount:         req.Amount,
-		LocalBlockHash: req.LocalBlockHash,
-		ReqByte:        req.ReqByte,
-	}
+	// requestBody := request.ReqBody{
+	// 	ChannelID:      req.ChannelID,
+	// 	Amount:         req.Amount,
+	// 	LocalBlockHash: req.LocalBlockHash,
+	// 	ReqByte:        req.ReqByte,
+	// }
 
-	reqBodyHash := requestBody.Keccak256Hash()
+	reqBodyHash := req.BodyKeccak256Hash()
 
-	paymentBody := request.PaymentBody{
-		// ChannelID: req.ChannelID,
-		Amount: req.Amount,
-	}
+	// paymentBody := request.PaymentBody{
+	// 	// ChannelID: req.ChannelID,
+	// 	Amount: req.Amount,
+	// }
 
+	paymentHash := req.PaymentKeccak256Hash()
 	// I spent more than 4 hours here to debug, because the signature received from the client always got altered
 	// I FIANLLY KNOW THE REASON:
 	// When you modify reqBSig[64] -= 27 inside VerifyRequestWithSig, it alters the original slice req.SignedReqBody because slices are reference types.
@@ -44,8 +45,8 @@ func (m *Manager) VerifyRequestWithSig(cID string, req request.RequestMsg) (bool
 	}
 
 	pubKB := m.GetClient(cID).PubKeyB
-	rbFlag := cryptoutil.Verify(pubKB, requestBody.Keccak256Hash().Bytes(), reqBSig)
-	pbFlag := cryptoutil.Verify(pubKB, paymentBody.PreHashByte(), payBSig)
+	rbFlag := cryptoutil.Verify(pubKB, reqBodyHash.Bytes(), reqBSig)
+	pbFlag := cryptoutil.Verify(pubKB, paymentHash.Bytes(), payBSig)
 	log.Println("rbFlag: ", rbFlag, " pbFlag: ", pbFlag)
 	return rbFlag && pbFlag, reqBodyHash
 }

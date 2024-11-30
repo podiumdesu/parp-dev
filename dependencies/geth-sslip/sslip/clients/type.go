@@ -3,6 +3,7 @@ package mClient
 import (
 	"log"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gorilla/websocket"
 )
@@ -11,7 +12,7 @@ type Client struct {
 	ID        string
 	Conn      *websocket.Conn
 	PubKeyB   []byte
-	ChannelID string
+	ChannelID common.Hash
 	WriteChan chan []byte
 }
 
@@ -20,7 +21,7 @@ func New(id string, conn *websocket.Conn) *Client {
 		ID:        id,
 		Conn:      conn,
 		PubKeyB:   []byte{},
-		ChannelID: "",
+		ChannelID: common.Hash{},
 		WriteChan: make(chan []byte, 256), // Buffered channel to avoid blocking
 	}
 }

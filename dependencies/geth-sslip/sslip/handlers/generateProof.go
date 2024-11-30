@@ -32,21 +32,6 @@ func TransactionsJSONRead() []*types.Transaction {
 	return txs
 }
 
-func FromEthTransaction(t *types.Transaction) *mpt.Transaction {
-	v, r, s := t.RawSignatureValues()
-	return &mpt.Transaction{
-		AccountNonce: t.Nonce(),
-		Price:        t.GasPrice(),
-		GasLimit:     t.Gas(),
-		Recipient:    t.To(),
-		Amount:       t.Value(),
-		Payload:      t.Data(),
-		V:            v,
-		R:            r,
-		S:            s,
-	}
-}
-
 func FuncTestTransactionRootAndProof() (mpt.Proof, []byte, common.Hash, *types.Transaction) {
 
 	trie := mpt.NewTrie()
@@ -55,7 +40,7 @@ func FuncTestTransactionRootAndProof() (mpt.Proof, []byte, common.Hash, *types.T
 	for i, tx := range txs {
 		// key is the encoding of the index as the unsigned integer type
 		key, _ := rlp.EncodeToBytes(uint(i))
-		transaction := FromEthTransaction(tx)
+		transaction := mpt.FromEthTransaction(tx)
 
 		// value is the RLP encoding of a transaction
 		rlp, _ := transaction.GetRLP()
@@ -78,7 +63,7 @@ func FuncTestTransactionRootAndProof() (mpt.Proof, []byte, common.Hash, *types.T
 	return proof, key, txHash, txs[30]
 }
 
-func printProofToSubmit(proof mpt.Proof, key []byte, rootHash common.Hash) {
+func PrintProofToSubmit(proof mpt.Proof, key []byte, rootHash common.Hash) {
 
 	log.Println("root Hash: ", rootHash)
 	// 2. Print the serialized proof as a bytes array (proof is []string).

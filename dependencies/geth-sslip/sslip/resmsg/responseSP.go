@@ -20,31 +20,34 @@ type ResponseSPBody struct {
 	// BlockNr *big.Int
 }
 type ResponseSPMsg struct {
-	Type               string
-	ChannelId          common.Hash
-	Amount             uint
-	ReqBodyHash        common.Hash
-	SignedReqBody      []byte
-	CurrentBlockHeight *big.Int
-	ReturnValue        []byte
-	Proof              [][]byte
-	Address            common.Address
-	// BlockNr            *big.Int
-	Signature []byte
+	Type           string
+	ChannelId      common.Hash
+	Amount         uint
+	ReqBodyHash    common.Hash
+	SignedReqBody  []byte
+	CurrentBlockNr *big.Int
+	ReturnValue    []byte
+	Proof          [][]byte
+	Address        []byte
+	Signature      []byte
+	TxRootHash     common.Hash
+	// BlockNr        *big.Int
+
 }
 
 func (r *ResponseSPMsg) Bytes() []byte {
 	return marshalToJson(r)
 }
 
-func (rb *ResponseSPBody) Keccak256Hash() common.Hash {
+func (r *ResponseSPMsg) Keccak256Hash() common.Hash {
 	data := []byte{}
-	data = append(data, rb.SignedReqBody...)
+	data = append(data, r.ChannelId.Bytes()...)
+	data = append(data, r.SignedReqBody...)
 
-	for _, proofItem := range rb.Proof {
+	for _, proofItem := range r.Proof {
 		data = append(data, []byte(proofItem)...) // Proof as bytes array
 	}
-	// data = append(data, rb.Address.Bytes()...)
+	// data = append(data, r.Address.Bytes()...)
 	// data = append(data, rb.BlockNr.Bytes()...)
 
 	// log.Println(hex.EncodeToString(rb.BlockNr.Bytes()))
@@ -73,16 +76,16 @@ func (r *ResponseSPMsg) RlpBytes() string {
 	return hexString
 }
 
-func (r *ResponseSPMsg) BodyHashBytes() []byte {
-	data := ResponseSPBody{
-		SignedReqBody: r.SignedReqBody,
-		Proof:         r.Proof,
-		// Address:       r.Address,
-		// BlockNr:       r.BlockNr,
-	}
-	return hashData(data)
-}
+// func (r *ResponseSPMsg) BodyHashBytes() []byte {
+// 	data := ResponseSPBody{
+// 		SignedReqBody: r.SignedReqBody,
+// 		Proof:         r.Proof,
+// 		// Address:       r.Address,
+// 		// BlockNr:       r.BlockNr,
+// 	}
+// 	return hashData(data)
+// }
 
-func (r *ResponseSPBody) HashBytes() []byte {
-	return hashData(r)
-}
+// func (r *ResponseSPBody) HashBytes() []byte {
+// 	return hashData(r)
+// }

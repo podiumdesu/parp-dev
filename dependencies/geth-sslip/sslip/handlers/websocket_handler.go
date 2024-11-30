@@ -1,20 +1,16 @@
 package handlers
 
 import (
-	"bytes"
-	"context"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math/big"
 	"net/http"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/poc-client/msg/handshake"
 	"github.com/ethereum/go-ethereum/poc-client/msg/request"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -124,8 +120,8 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 					log.Println("Unmarshal error: ", err)
 					break
 				}
-				jsonHsMsg, _ := json.Marshal(hsMsg)
-				log.Println("Handshake msg: ", string(jsonHsMsg))
+				// jsonHsMsg, _ := json.Marshal(hsMsg)
+				// log.Println("Handshake msg: ", string(jsonHsMsg))
 
 				m.SetClientPubKB(clientID, hsMsg.Body.PubKB)
 				m.SetContractAddress(hsMsg.Body.ContractAddress)
@@ -191,6 +187,9 @@ func HandleWebSocket(m *manager.Manager) http.HandlerFunc {
 				}
 				client.Send(msg.Bytes())
 				fmt.Println("------------------------------------------------------\n")
+
+			case "OpenChan":
+				handler_openChan(clientID, body, m, conn, mt)
 
 			case "TX":
 				handler_tx(clientID, body, m, conn, mt)
@@ -263,21 +262,6 @@ func printResponseMsg(msg resmsg.ResponseMsg) {
 	fmt.Println()
 }
 
-func fromEthTransaction(t *types.Transaction) *mpt.Transaction {
-	v, r, s := t.RawSignatureValues()
-	return &mpt.Transaction{
-		AccountNonce: t.Nonce(),
-		Price:        t.GasPrice(),
-		GasLimit:     t.Gas(),
-		Recipient:    t.To(),
-		Amount:       t.Value(),
-		Payload:      t.Data(),
-		V:            v,
-		R:            r,
-		S:            s,
-	}
-}
-
 func trieWithBlockTxs(txs []*types.Transaction, txRootHash common.Hash, txHash common.Hash, block *types.Block) {
 
 	// txs := transactionsJSON()
@@ -287,7 +271,7 @@ func trieWithBlockTxs(txs []*types.Transaction, txRootHash common.Hash, txHash c
 	for i, tx := range txs {
 		key, _ := rlp.EncodeToBytes(uint(i))
 
-		transaction := fromEthTransaction(tx)
+		transaction := mpt.FromEthTransaction(tx)
 
 		rlp, _ := transaction.GetRLP()
 
@@ -307,76 +291,42 @@ func trieWithBlockTxs(txs []*types.Transaction, txRootHash common.Hash, txHash c
 	fmt.Printf("proof: %x, found: %v\n", proof, found)
 
 	txRLP, _ := mpt.VerifyProof(mptTrie.Hash(), key, proof)
-	rlp, _ := fromEthTransaction(txs[0]).GetRLP()
+	rlp, _ := mpt.FromEthTransaction(txs[0]).GetRLP()
 
 	fmt.Println(txRLP)
 	fmt.Println(rlp)
 }
 
-func generateProof(block *types.Block, txHash common.Hash) (mpt.Proof, []byte) {
-	txs := block.Transactions()
-	idx := -1
-	for index, tx := range txs {
-		if tx.Hash() == txHash {
-			idx = index
-		}
-	}
-	if idx < 0 {
-		return nil, nil
-	}
+// func generateProof(block *types.Block, txHash common.Hash) (mpt.Proof, []byte) {
+// 	txs := block.Transactions()
+// 	idx := -1
+// 	for index, tx := range txs {
+// 		if tx.Hash() == txHash {
+// 			idx = index
+// 		}
+// 	}
+// 	if idx < 0 {
+// 		return nil, nil
+// 	}
 
-	mptTrie := mpt.NewTrie()
-	for i, tx := range txs {
-		key, _ := rlp.EncodeToBytes(uint(i))
+// 	mptTrie := mpt.NewTrie()
+// 	for i, tx := range txs {
+// 		key, _ := rlp.EncodeToBytes(uint(i))
 
-		transaction := fromEthTransaction(tx)
+// 		transaction := mpt.FromEthTransaction(tx)
 
-		rlp, _ := transaction.GetRLP()
+// 		rlp, _ := transaction.GetRLP()
 
-		mptTrie.Put(key, rlp)
-	}
+// 		mptTrie.Put(key, rlp)
+// 	}
 
-	// generate the proof and verify it
-	key, _ := rlp.EncodeToBytes(uint(idx))
-	proof, found := mptTrie.Prove(key)
-	proofSize := len(proof.Serialize()[0])
-	log.Println("proofSize: ", proofSize)
+// 	// generate the proof and verify it
+// 	key, _ := rlp.EncodeToBytes(uint(idx))
+// 	proof, found := mptTrie.Prove(key)
+// 	proofSize := len(proof.Serialize()[0])
+// 	log.Println("proofSize: ", proofSize)
 
-	fmt.Printf("proof: %x, found: %v\n", proof, found)
+// 	fmt.Printf("proof: %x, found: %v\n", proof, found)
 
-	return proof, key
-}
-
-func verifyProof(txHash common.Hash, proof mpt.Proof, blockNr *big.Int, key []byte) bool {
-	wsEndpoint := "ws://localhost:8100"
-	bcClient, err := ethclient.Dial(wsEndpoint)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// query the block information
-	block, _ := bcClient.HeaderByNumber(context.Background(), blockNr)
-	txRootHash := block.TxHash
-	tx, _, _ := bcClient.TransactionByHash(context.Background(), txHash)
-	txRLP, _ := rlp.EncodeToBytes(tx)
-	txProofRLP, _ := mpt.VerifyProof(txRootHash[:], key, proof)
-	log.Println("txProofRLP: ", txProofRLP)
-	log.Println("txRLP: ", txRLP)
-	log.Println("proof: ", proof.Serialize())
-
-	return bytes.Equal(txRLP, txProofRLP)
-
-	// log.Println("Block Hash: ", block)
-	// txRootHash common.Hash, idx uint, proof mpt.Proof
-	// key, _ := rlp.EncodeToBytes(uint(idx))
-	// txRLP, _ := mpt.VerifyProof(txRootHash[:], key, proof)
-	// rlp, _ := rlp.EncodeToBytes(tx)
-	// log.Println(txRLP)
-	// log.Println(rlp)
-	// return bytes.Equal(txRLP, rlp)
-}
-
-// txRLP, _ := mpt.VerifyProof(mptTrie.Hash(), key, proof)
-// rlp, _ := fromEthTransaction(txs[0]).GetRLP()
-
-// fmt.Println(txRLP)
-// fmt.Println(rlp)
+// 	return proof, key
+// }

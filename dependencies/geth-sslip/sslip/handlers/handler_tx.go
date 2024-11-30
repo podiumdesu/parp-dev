@@ -4,15 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
-	"fmt"
 	"log"
-	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/poc-client/msg/request"
 	"github.com/ethereum/go-ethereum/poc-client/utils/cryptoutil"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/sslip/manager"
@@ -37,6 +33,10 @@ func handler_tx(clientID string, body string, m *manager.Manager, conn *websocke
 
 	// Send the result of the signature check to the client
 	conn.WriteMessage(mt, sigCheckMsg.Bytes())
+	reqChannelId := m.GetClientChannelID(clientID)
+	if reqChannelId == req.ChannelID {
+		log.Println("Channel ID matched", req.ChannelID)
+	}
 
 	log.Println("*************************Pre check passed!*************************")
 
@@ -73,46 +73,14 @@ func handler_tx(clientID string, body string, m *manager.Manager, conn *websocke
 	log.Printf("Transaction mined in block %d", txReceipt.BlockNumber.Uint64())
 
 	log.Println("*************************Block mining end!*************************")
-	// By directly monitor the mempool
-
-	// Retrieve result
-	const contractABI = `[{"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"ChannelOpened","type":"event"},{"inputs":[{"internalType":"address","name":"addr","type":"address"}],"name":"balance","outputs":[{"internalType":"uint256","name":"bal","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"closeChan","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"confirmClosure","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"}],"name":"greeting","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"senderDeposit","type":"uint256"}],"name":"openChan","outputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"paychanCheck","outputs":[{"components":[{"internalType":"bytes32","name":"id","type":"bytes32"},{"internalType":"address payable","name":"sender","type":"address"},{"internalType":"address payable","name":"recipient","type":"address"},{"internalType":"uint256","name":"senderDeposit","type":"uint256"},{"internalType":"uint256","name":"startTime","type":"uint256"},{"internalType":"uint256","name":"status","type":"uint256"},{"internalType":"uint256","name":"fee","type":"uint256"},{"internalType":"uint256","name":"disputeStartTime","type":"uint256"},{"internalType":"uint256","name":"disputeDuration","type":"uint256"},{"internalType":"bool","name":"senderConfirm","type":"bool"},{"internalType":"bool","name":"recipientConfirm","type":"bool"}],"internalType":"struct paychan.PayChan","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"paychanSelectedArguments","outputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"rec","type":"address"},{"internalType":"uint256","name":"status","type":"uint256"},{"internalType":"uint256","name":"senderB","type":"uint256"},{"internalType":"uint256","name":"fee","type":"uint256"}],"stateMutability":"view","type":"function"}]`
-	contractAbi, err := abi.JSON(strings.NewReader(string(contractABI)))
-	var channelId common.Hash
-	for _, vLog := range txReceipt.Logs {
-		fmt.Printf("Log Address: %s\n", vLog.Address.Hex())
-		if len(vLog.Topics) > 0 {
-			eventName, err := contractAbi.EventByID(vLog.Topics[0])
-			if err != nil {
-				log.Println("Error finding event name:", err)
-				continue
-			}
-			fmt.Printf("Event Name: %s\n", eventName.Name)
-
-			// var results []interface{}
-			if len(vLog.Topics) > 1 {
-
-				channelId = common.BytesToHash(vLog.Topics[1].Bytes())
-				m.SetClientChannelID(clientID, string(channelId.Hex()))
-				fmt.Printf("Channel ID: %s\n", channelId.Hex())
-				fmt.Printf("Channel ID: %s\n", m.GetClientChannelID(clientID))
-				msg = resmsg.ServerMsg{
-					Type: "info-hex",
-					Info: channelId.Bytes(),
-				}
-				client.Send(msg.Bytes())
-			}
-		}
-	}
 
 	log.Println()
 	log.Printf("----------------Generating Proof--------------------")
 
-	// To delete later
-	proof, idx, txHash, tx30 := FuncTestTransactionRootAndProof()
-	// blockNr := big.NewInt(int64(10467135))
-	txRootHash := common.HexToHash("bb345e208bda953c908027a45aa443d6cab6b8d2fd64e83ec52f1008ddeafa58")
-	printProofToSubmit(proof, idx, txRootHash)
+	// // To delete later
+	// proof, idx, txHash, tx30 := FuncTestTransactionRootAndProof()
+	// // blockNr := big.NewInt(int64(10467135))
+	// txRootHash := common.HexToHash("bb345e208bda953c908027a45aa443d6cab6b8d2fd64e83ec52f1008ddeafa58")
 
 	// ----end
 
@@ -120,9 +88,16 @@ func handler_tx(clientID string, body string, m *manager.Manager, conn *websocke
 	blockHash := txReceipt.BlockHash
 	block, _ := bcClient.BlockByHash(context.Background(), blockHash)
 	blockNr := block.Number()
-	// txHash := txReceipt.TxHash
-	// txRootHash := block.TxHash()
-	// proof, idx := generateProof(block, txHash)
+	txHash := txReceipt.TxHash
+	txRootHash := block.TxHash()
+	proof, idx := generateProof(block, txHash)
+
+	// -----Log Helper: for block information
+	// currentBlockHeader, _ := bcClient.HeaderByNumber(context.Background(), blockNr)
+	// ComputeBlockHash(currentBlockHeader)
+	// PrintBlockInfo(currentBlockHeader)
+	// log.Println(BhRlpBytes(currentBlockHeader))
+	// -----end
 
 	log.Println("*************************Generation end!*************************")
 
@@ -131,27 +106,21 @@ func handler_tx(clientID string, body string, m *manager.Manager, conn *websocke
 	if proof == nil {
 		log.Println("Error: unable to generate the proof")
 	} else {
-		res := verifyProofTmpt(txHash, proof, idx, tx30)
+		// res := verifyProofTmpt(txHash, proof, idx, tx30)
+		res := verifyProof(txHash, proof, blockNr, idx)
 
+		// -----Log Helper: print proof information to submit on-chain
+		// PrintProofToSubmit(proof, idx, txRootHash)
+		// -----end
 		log.Println("Proof Verification: ", res)
 
 	}
 	log.Println("*************************Proof verification end!*************************")
 
-	// Send the response to the client
-
 	log.Println()
 	log.Printf("----------------Generating response!!--------------------")
 
-	responseBody := resmsg.ResponseBody{
-		SignedReqBody: req.SignedReqBody,
-		Proof:         proof.CustomRLPSerialize(),
-		TxHash:        txHash,
-		TxIdx:         idx,
-	}
-
-	sig := cryptoutil.SignHash(m.PrivateKey, responseBody.Keccak256Hash())
-
+	channelId := m.GetClientChannelID(clientID)
 	responseMsg := resmsg.ResponseMsg{
 		Type:               "response",
 		ChannelId:          channelId,
@@ -163,53 +132,77 @@ func handler_tx(clientID string, body string, m *manager.Manager, conn *websocke
 		Proof:              proof.CustomRLPSerialize(),
 		TxHash:             txHash,
 		TxIdx:              idx,
-		Signature:          sig,
+		Signature:          nil,
+		RootHash:           txRootHash,
 	}
 
-	log.Println("SignedReqBody:", hex.EncodeToString(req.SignedReqBody))
-	log.Println("Signature:", hex.EncodeToString(sig))
-	log.Println("resHash: ", responseBody.Keccak256Hash())
-	log.Println("reqHash: ", reqHash)
+	responseBodyHash := responseMsg.Keccak256Hash()
+	sig := cryptoutil.SignHash(m.PrivateKey, responseBodyHash)
+	responseMsg.Signature = sig
 
-	fmt.Println("-=-=-=-=-= Now print response message bytes -=-=-=-=-=-=")
-	log.Println(responseMsg.RlpBytes())
+	// -----Log Helper: print response message to verify hash values
+	// log.Println("channelId: ", channelId)
+	// log.Println("RootHash: ", txRootHash)
+	// log.Println("SignedReqBody:", hex.EncodeToString(req.SignedReqBody))
+	// log.Println("Signature:", hex.EncodeToString(sig))
+	// log.Println("resHash: ", responseBodyHash)
+	// log.Println("reqHash: ", reqHash)
+	// -----end
 
-	fmt.Println("-=-=-=-=-= Now print request body bytes -=-=-=-=-=-=")
-	reqBody := request.ReqBody{
-		// ChannelID:      req.ChannelID,
-		Amount:         req.Amount,
-		LocalBlockHash: req.LocalBlockHash,
-		ReqByte:        req.ReqByte,
-	}
-	reqBodyBytesString := reqBody.RlpBytes()
-	log.Println(reqBodyBytesString)
+	// -----Log Helper: print response message bytes
+	// fmt.Println("-=-=-=-=-= Now print response message bytes -=-=-=-=-=-=")
+	// log.Println(responseMsg.RlpBytes())
 
-	fmt.Println("*********************************************************************")
+	// fmt.Println("-=-=-=-=-= Now print request body bytes -=-=-=-=-=-=")
+	// reqBodyBytesString := req.RequestBodyRlpBytes()
+	// log.Println(reqBodyBytesString)
+
+	// fmt.Println("*********************************************************************")
+	// -----end
+
+	// log.Println("-=-=-=-=-=-= Now print request payment bytes -=-=-=-=-=-=")
+	// log.Println("Payment body byte: ", req.PaymentBodyRlpBytes())
+	// log.Println("*********************************************************************")
 
 	_ = conn.WriteMessage(mt, responseMsg.Bytes())
 
 	return nil
 }
 
+func generateProof(block *types.Block, txHash common.Hash) (mpt.Proof, []byte) {
+	txs := block.Transactions()
+	idx := -1
+	for index, tx := range txs {
+		if tx.Hash() == txHash {
+			idx = index
+		}
+	}
+	if idx < 0 {
+		return nil, nil
+	}
+
+	mptTrie := mpt.NewTrie()
+	for i, tx := range txs {
+		key, _ := rlp.EncodeToBytes(uint(i))
+
+		transaction := mpt.FromEthTransaction(tx)
+
+		rlp, _ := transaction.GetRLP()
+
+		mptTrie.Put(key, rlp)
+	}
+
+	// generate the proof and verify it
+	key, _ := rlp.EncodeToBytes(uint(idx))
+	proof, _ := mptTrie.Prove(key)
+	// proofSize := len(proof.Serialize()[0])
+	// log.Println("proofSize: ", proofSize)
+	// fmt.Printf("proof: %x, found: %v\n", proof, found)
+
+	return proof, key
+}
+
 func verifyProofTmpt(txHash common.Hash, proof mpt.Proof, key []byte, tx *types.Transaction) bool {
-	// wsEndpoint := "ws://localhost:8100"
-	// bcClient, err := ethclient.Dial(wsEndpoint)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// the old one
-	// block, _ := bcClient.HeaderByNumber(context.Background(), blockNr)
-	// txRootHash := block.TxHash
-	// tx, _, _ := bcClient.TransactionByHash(context.Background(), txHash)
-	// txRLP, _ := rlp.EncodeToBytes(tx)
-	// txProofRLP, _ := mpt.VerifyProof(txRootHash[:], key, proof)
-	// log.Println("txProofRLP: ", txProofRLP)
-	// log.Println("txRLP: ", txRLP)
-	// log.Println("proof: ", proof.Serialize())
-
-	// return bytes.Equal(txRLP, txProofRLP)
-
-	// To match the new one
 
 	txRootHash, _ := hex.DecodeString("bb345e208bda953c908027a45aa443d6cab6b8d2fd64e83ec52f1008ddeafa58")
 	txRLP, _ := rlp.EncodeToBytes(tx)

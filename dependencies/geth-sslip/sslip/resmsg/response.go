@@ -29,18 +29,20 @@ type ResponseMsg struct {
 	TxHash             common.Hash
 	TxIdx              []byte
 	Signature          []byte
+	RootHash           common.Hash
 }
 
-func (rb *ResponseBody) HashBytes() []byte {
-	return hashData(rb)
-}
+// func (rb *ResponseBody) HashBytes() []byte {
+// 	return hashData(rb)
+// }
 
 func (r *ResponseMsg) Bytes() []byte {
 	return marshalToJson(r)
 }
 
-func (rb *ResponseBody) Keccak256Hash() common.Hash {
+func (rb *ResponseMsg) Keccak256Hash() common.Hash {
 	data := []byte{}
+	data = append(data, rb.ChannelId.Bytes()...)
 	data = append(data, rb.SignedReqBody...)
 
 	for _, proofItem := range rb.Proof {
@@ -74,12 +76,34 @@ func (r *ResponseMsg) RlpBytes() string {
 	return hexString
 }
 
-func (r *ResponseMsg) BodyHashBytes() []byte {
-	data := ResponseBody{
-		// SignedReqBody: r.SignedReqBody,
-		// Proof:  r.Proof,
-		TxHash: r.TxHash,
-		TxIdx:  r.TxIdx,
-	}
-	return hashData(data)
-}
+// func (rb *ResponseBody) Keccak256Hash() common.Hash {
+// 	data := []byte{}
+// 	data = append(data, rb.SignedReqBody...)
+
+// 	for _, proofItem := range rb.Proof {
+// 		data = append(data, []byte(proofItem)...) // Proof as bytes array
+// 	}
+// 	data = append(data, rb.TxHash.Bytes()...)
+// 	data = append(data, rb.TxIdx...)
+
+// 	hash := crypto.Keccak256Hash(data)
+
+// 	// log.Println("----------------------NOW I WANT TO CHECK THE HASH!!!!----------------------")
+// 	// log.Println(rb.Proof)
+// 	// log.Println(rb.TxHash)
+// 	// log.Println(rb.TxIdx)
+// 	// log.Println(data)
+
+// 	// log.Println("----------------------END!----------------------")
+// 	return hash
+// }
+
+// func (r *ResponseMsg) BodyHashBytes() []byte {
+// 	data := ResponseBody{
+// 		// SignedReqBody: r.SignedReqBody,
+// 		// Proof:  r.Proof,
+// 		TxHash: r.TxHash,
+// 		TxIdx:  r.TxIdx,
+// 	}
+// 	return hashData(data)
+// }
