@@ -19,7 +19,6 @@ package rpc
 import (
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -165,23 +164,23 @@ func (s *Server) serveSingleRequest(ctx context.Context, codec ServerCodec) {
 	}
 
 	// Extract and log metadata
-	peerInfo := PeerInfoFromContext(ctx)
-	for _, req := range reqs {
-		// Convert params to a readable JSON string
-		paramsStr, err := json.Marshal(req.Params)
-		if err != nil {
-			log.Error("Failed to marshal RPC params", "err", err)
-			continue
-		}
+	// peerInfo := PeerInfoFromContext(ctx)
+	// for _, req := range reqs {
+	// 	// Convert params to a readable JSON string
+	// 	paramsStr, err := json.Marshal(req.Params)
+	// 	if err != nil {
+	// 		log.Error("Failed to marshal RPC params", "err", err)
+	// 		continue
+	// 	}
 
-		log.Info("Received RPC request",
-			"method", req.Method,
-			"params", string(paramsStr),
-			"from", peerInfo.RemoteAddr)
+	// 	log.Info("Received RPC request",
+	// 		"method", req.Method,
+	// 		"params", string(paramsStr),
+	// 		"from", peerInfo.RemoteAddr)
 
-		// Save to file
-		logToFile(peerInfo, req.Method, string(paramsStr))
-	}
+	// 	// Save to file
+	// 	logToFile(peerInfo, req.Method, string(paramsStr))
+	// }
 
 	if batch {
 		h.handleBatch(reqs)
