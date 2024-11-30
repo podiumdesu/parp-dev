@@ -57,9 +57,9 @@ func (c *Client) Start(hubSend chan<- []byte) {
 	c.sendTokenTx(&wg, hubSend, "0xf3D1dBbC7Db2CC7eAE8b44e7c4422DC041993178", big.NewInt(10000000))
 	wg.Wait()
 
-	// wg.Add(1)
-	// c.SendBalanceCheckRequest(&wg, hubSend)
-	// wg.Wait()
+	wg.Add(1)
+	c.SendBalanceCheckRequest(&wg, hubSend)
+	wg.Wait()
 }
 
 func (c *Client) ConnectToBlockchain() (*ethclient.Client, error) {

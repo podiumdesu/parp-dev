@@ -126,7 +126,7 @@ func handler_req(clientID string, body string, m *manager.Manager, conn *websock
 	log.Println("resHash: ", resBodyHash)
 	log.Println("reqHash: ", reqHash)
 
-	// fmt.Println("-=-=-=-=-= Now print response message bytes -=-=-=-=-=-=")
+	fmt.Println("-=-=-=-=-= Now print response message bytes -=-=-=-=-=-=")
 	// log.Println(responseSPMsg.RlpBytes())
 
 	// responseSPMsg.Proof[1][3] = '4'
@@ -134,13 +134,13 @@ func handler_req(clientID string, body string, m *manager.Manager, conn *websock
 	// resBodyHash = responseSPMsg.Keccak256Hash()
 	// sig = cryptoutil.SignHash(m.PrivateKey, resBodyHash)
 	// responseSPMsg.Signature = sig
-	// log.Println(responseSPMsg.RlpBytes())
-	// fmt.Println("*********************************************************************")
+	log.Println(responseSPMsg.RlpBytes())
+	fmt.Println("*********************************************************************")
 
-	// reqBodyBytesString := req.RequestBodyRlpBytes()
-	// log.Println(reqBodyBytesString)
+	reqBodyBytesString := req.RequestBodyRlpBytes()
+	log.Println(reqBodyBytesString)
 
-	// fmt.Println("*********************************************************************")
+	fmt.Println("*********************************************************************")
 
 	log.Println("-=-=-=-=-=-= Now print request payment bytes -=-=-=-=-=-=")
 	log.Println("Payment body byte: ", req.PaymentBodyRlpBytes())
@@ -153,19 +153,6 @@ func handler_req(clientID string, body string, m *manager.Manager, conn *websock
 	//   -H "Content-Type: application/json" \
 	//   -d '{"jsonrpc":"2.0","method":"eth_getProof","params":["0x50D69B935A828113Dd0E4c7Fc721105632014a1d",["0x0"], "0x2EE"],"id":1}'
 	return nil
-}
-
-func BhRlpBytes(blockHeader *types.Header) string {
-	// Encode the ResponseMsg to RLP bytes
-	serializedBytes, err := rlp.EncodeToBytes(blockHeader)
-	if err != nil {
-		log.Fatalf("Failed to RLP encode ResponseMsg: %v", err)
-	}
-
-	// Convert the serialized RLP bytes to a hex string, prefixed with "0x"
-	hexString := "0x" + hex.EncodeToString(serializedBytes)
-
-	return hexString
 }
 
 func PrintBlockInfo(header *types.Header) {
@@ -271,12 +258,12 @@ func generateStorageProof(address string, pos string, blockN *big.Int) *mpt.Proo
 	if err != nil {
 		log.Fatalf("Failed to execute request: %v", err)
 	}
-	log.Println(resultProof)
+	// log.Println(resultProof)
 
 	extendedResultProof := append([]byte(`{"jsonrpc":"2.0","id":1,"result":`), resultProof...)
 	extendedResultProof = append(extendedResultProof, []byte(`}`)...)
 
-	log.Println(string(extendedResultProof))
+	// log.Println(string(extendedResultProof))
 	// load into the struct
 	var response mpt.EthGetProofResponse
 	err = json.Unmarshal(extendedResultProof, &response)

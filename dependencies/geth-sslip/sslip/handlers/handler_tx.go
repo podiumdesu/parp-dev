@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
+	"fmt"
 	"log"
 	"time"
 
@@ -150,14 +151,14 @@ func handler_tx(clientID string, body string, m *manager.Manager, conn *websocke
 	// -----end
 
 	// -----Log Helper: print response message bytes
-	// fmt.Println("-=-=-=-=-= Now print response message bytes -=-=-=-=-=-=")
-	// log.Println(responseMsg.RlpBytes())
+	fmt.Println("-=-=-=-=-= Now print response message bytes -=-=-=-=-=-=")
+	log.Println(responseMsg.RlpBytes())
 
-	// fmt.Println("-=-=-=-=-= Now print request body bytes -=-=-=-=-=-=")
-	// reqBodyBytesString := req.RequestBodyRlpBytes()
-	// log.Println(reqBodyBytesString)
+	fmt.Println("-=-=-=-=-= Now print request body bytes -=-=-=-=-=-=")
+	reqBodyBytesString := req.RequestBodyRlpBytes()
+	log.Println(reqBodyBytesString)
 
-	// fmt.Println("*********************************************************************")
+	fmt.Println("*********************************************************************")
 	// -----end
 
 	log.Println("-=-=-=-=-=-= Now print request payment bytes -=-=-=-=-=-=")

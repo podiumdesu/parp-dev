@@ -9,6 +9,7 @@ import (
 	"log"
 	"math/big"
 	"poc-client/client"
+	utils "poc-client/utils/common"
 	"poc-client/utils/cryptoutil"
 
 	"github.com/ethereum/go-ethereum/sslip/mpt"
@@ -41,9 +42,18 @@ func HandleResponse(msg []byte, client *client.Client) error {
 	}
 	res = verifySerializedProof(client, resMsg.TxHash, proof, resMsg.CurrentBlockHeight, resMsg.TxIdx)
 
+	bcClient, err := client.ConnectToBlockchain()
+	if err != nil {
+		return err
+	}
+	blockHeader, _ := bcClient.HeaderByNumber(context.Background(), resMsg.CurrentBlockHeight)
+	log.Println()
+	log.Println("[RESPONSE] Print block header bytes: ")
+	log.Println(utils.BhRlpBytes(blockHeader))
+
 	log.Println("[RESPONSE] Proof Verification: ", res)
 
-	fmt.Println("-=-=-=-=-= Now print response message bytes -=-=-=-=-=-=")
+	fmt.Println("-=-=-=-=-= [RESPONSE] Now print response message bytes -=-=-=-=-=-=")
 	log.Println(resMsg.RlpBytes())
 	fmt.Println("*********************************************************************")
 
@@ -70,6 +80,7 @@ func verifySerializedProof(client *client.Client, txHash common.Hash, proofBytes
 
 	txProofRLP, _ := mpt.VerifyProof(txRootHash[:], key, proof)
 
+	PrintProofToSubmit(proof, key, txRootHash)
 	return bytes.Equal(txRLP, txProofRLP)
 
 }

@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/big"
 	"poc-client/client"
+	utils "poc-client/utils/common"
 	"poc-client/utils/cryptoutil"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -32,8 +33,22 @@ func HandleResponseSP(msg []byte, client *client.Client) error {
 	if err != nil {
 		log.Println("Error deserializing proof: ", err)
 	}
+
+	bcClient, err := client.ConnectToBlockchain()
+	if err != nil {
+		return err
+	}
+	blockHeader, _ := bcClient.HeaderByNumber(context.Background(), resMsg.CurrentBlockNr)
+	log.Println()
+	log.Println("[RES-SP] Print block header bytes: ")
+	log.Println(utils.BhRlpBytes(blockHeader))
+
 	result, _ := verifySPProof(client, proof, resMsg.CurrentBlockNr, resMsg.Address)
 	log.Println("[RES-SP] Proof Verification: ", result)
+
+	fmt.Println("-=-=-=-=-= [RES-SP] Now print response message bytes -=-=-=-=-=-=")
+	log.Println(resMsg.RlpBytes())
+	fmt.Println("*********************************************************************")
 
 	return nil
 }
