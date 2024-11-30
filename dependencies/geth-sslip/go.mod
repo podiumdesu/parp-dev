@@ -2,13 +2,13 @@ module github.com/ethereum/go-ethereum
 
 go 1.20
 
-replace github.com/ethereum/go-ethereum/sslip/manager => ./sslip/manager
+// replace github.com/ethereum/go-ethereum/sslip/manager => ./sslip/manager
 
-replace github.com/ethereum/go-ethereum/sslip/handlers => ./sslip/handlers
+// replace github.com/ethereum/go-ethereum/sslip/handlers => ./sslip/handlers
 
-replace github.com/ethereum/go-ethereum/sslip/clients => ./sslip/clients
+// replace github.com/ethereum/go-ethereum/sslip/clients => ./sslip/clients
 
-replace github.com/ethereum/go-ethereum/poc-client v0.0.1 => ../../poc/poc-client
+replace github.com/ethereum/go-ethereum/poc-client v0.0.1 => ../../poc-client
 
 // replace github.com/ethereum/go-ethereum/poc-client/msg/request v0.0.1 => /Users/weihong/github/go-learning/poc-client/msg/request
 // replace github.com/ethereum/go-ethereum/poc-client/msg/handshake v0.0.1 => /Users/weihong/github/go-learning/poc-client/msg/handshake
@@ -33,8 +33,8 @@ require (
 	github.com/deckarep/golang-set/v2 v2.1.0
 	github.com/dop251/goja v0.0.0-20230806174421-c933cf95e127
 	github.com/ethereum/c-kzg-4844 v0.4.0
-	github.com/ethereum/go-ethereum/sslip/handlers v0.0.0-00010101000000-000000000000
-	github.com/ethereum/go-ethereum/sslip/manager v0.0.0-00010101000000-000000000000
+	// github.com/ethereum/go-ethereum/sslip/handlers v0.0.0-00010101000000-000000000000
+	// github.com/ethereum/go-ethereum/sslip/manager v0.0.0-00010101000000-000000000000
 	github.com/fatih/color v1.13.0
 	github.com/ferranbt/fastssz v0.1.2
 	github.com/fjl/gencodec v0.0.0-20230517082657-f9840df7b83e
@@ -115,8 +115,8 @@ require (
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
 	github.com/deepmap/oapi-codegen v1.6.0 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
-	github.com/ethereum/go-ethereum/poc-client v0.0.1 // indirect
-	github.com/ethereum/go-ethereum/sslip/clients v0.0.0-00010101000000-000000000000 // indirect
+	github.com/ethereum/go-ethereum/poc-client v0.0.1
+	// github.com/ethereum/go-ethereum/sslip/clients v0.0.0-00010101000000-000000000000 // indirect
 	github.com/garslo/gogen v0.0.0-20170306192744-1d203ffc1f61 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
