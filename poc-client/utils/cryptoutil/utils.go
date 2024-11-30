@@ -40,11 +40,13 @@ func Verify(pubKeyByte []byte, hashByte []byte, sig []byte) bool {
 
 	// 3. crypto.SigToPub
 
-	if sig[64] == 27 || sig[64] == 28 {
-		sig[64] -= 27
+	sigCopy := append([]byte{}, sig...)
+
+	if sigCopy[64] == 27 || sigCopy[64] == 28 {
+		sigCopy[64] -= 27
 	}
 
-	sigPubKeyECDSA, _ := crypto.SigToPub(hashByte, sig)
+	sigPubKeyECDSA, _ := crypto.SigToPub(hashByte, sigCopy)
 	sigPubKeyB := crypto.FromECDSAPub(sigPubKeyECDSA)
 	return bytes.Equal(sigPubKeyB, pubKeyByte)
 }
