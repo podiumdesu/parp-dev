@@ -2,9 +2,5 @@
 
 A protocol that enables **permissionless** and **accountable** access to a decentralized RPC service while keeping fair monetary compensation. 
 
-## Installation Instructions
-
-To run our test net
-
 
 
