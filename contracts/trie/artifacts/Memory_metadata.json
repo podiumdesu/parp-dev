@@ -1,0 +1,45 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/trie/Memory.sol": "Memory"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/trie/Memory.sol": {
+			"keccak256": "0x31877187eab669aa48e4eeb58a521d2b4f526a0cd6c16c9d3d819b6aa87b759b",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://925b76249c53b7b3a361867e95194914be3e105b0f8e517f0a2828e3ae57bb32",
+				"dweb:/ipfs/QmYvJ5mtNfLeJNsobxBazRPoMes49abxv5Umvdr1MK5ZPx"
+			]
+		}
+	},
+	"version": 1
+}

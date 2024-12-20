@@ -1,0 +1,45 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/trie/NibbleSlice.sol": "NibbleSliceOps"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/trie/NibbleSlice.sol": {
+			"keccak256": "0x06cb709d27758d228fefb0fd4f72e7824190723c0a5bef9c61bf33c37896e6e6",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://7c2860ceaa751f51952085cfc797d7b0980ccd36e43ff771a7cee45621cc8ede",
+				"dweb:/ipfs/QmekfeoJD56Nx5nNwdpDsRfCoggagq6y3pT2YA9CMt2Zsi"
+			]
+		}
+	},
+	"version": 1
+}

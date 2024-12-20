@@ -1,0 +1,45 @@
+{
+	"compiler": {
+		"version": "0.8.24+commit.e11b9ed9"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/fraud-detector/libs/ProofHelper.sol": "FraudProofDecoderLibrary"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/fraud-detector/libs/ProofHelper.sol": {
+			"keccak256": "0xc0a35e100eb1175b27e1e305bb505262310265d09d9cd8291a9593ab266fd8cf",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://b9dfaec0825e270596477d27b2fadeaa11507bcdac4e8b9685b0e4b5ddfae034",
+				"dweb:/ipfs/Qmc5FA7tU8WUzYYXkkU7esJAyhVb59KXf21TnVme8vEWbN"
+			]
+		}
+	},
+	"version": 1
+}

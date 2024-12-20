@@ -1,0 +1,83 @@
+{
+	"deploy": {
+		"VM:-": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"main:1": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"ropsten:3": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"rinkeby:4": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"kovan:42": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"goerli:5": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"Custom": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		}
+	},
+	"data": {
+		"bytecode": {
+			"functionDebugData": {},
+			"generatedSources": [],
+			"linkReferences": {},
+			"object": "6055604b600b8282823980515f1a607314603f577f4e487b71000000000000000000000000000000000000000000000000000000005f525f60045260245ffd5b305f52607381538281f3fe730000000000000000000000000000000000000000301460806040525f80fdfea2646970667358221220ddd0ac764a748b860a05a2bad71ef10a1377f4843fa58405045327c76a1b598a64736f6c634300081a0033",
+			"opcodes": "PUSH1 0x55 PUSH1 0x4B PUSH1 0xB DUP3 DUP3 DUP3 CODECOPY DUP1 MLOAD PUSH0 BYTE PUSH1 0x73 EQ PUSH1 0x3F JUMPI PUSH32 0x4E487B7100000000000000000000000000000000000000000000000000000000 PUSH0 MSTORE PUSH0 PUSH1 0x4 MSTORE PUSH1 0x24 PUSH0 REVERT JUMPDEST ADDRESS PUSH0 MSTORE PUSH1 0x73 DUP2 MSTORE8 DUP3 DUP2 RETURN INVALID PUSH20 0x0 ADDRESS EQ PUSH1 0x80 PUSH1 0x40 MSTORE PUSH0 DUP1 REVERT INVALID LOG2 PUSH5 0x6970667358 0x22 SLT KECCAK256 0xDD 0xD0 0xAC PUSH23 0x4A748B860A05A2BAD71EF10A1377F4843FA58405045327 0xC7 PUSH11 0x1B598A64736F6C63430008 BYTE STOP CALLER ",
+			"sourceMap": "179:10462:0:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"
+		},
+		"deployedBytecode": {
+			"functionDebugData": {},
+			"generatedSources": [],
+			"immutableReferences": {},
+			"linkReferences": {},
+			"object": "730000000000000000000000000000000000000000301460806040525f80fdfea2646970667358221220ddd0ac764a748b860a05a2bad71ef10a1377f4843fa58405045327c76a1b598a64736f6c634300081a0033",
+			"opcodes": "PUSH20 0x0 ADDRESS EQ PUSH1 0x80 PUSH1 0x40 MSTORE PUSH0 DUP1 REVERT INVALID LOG2 PUSH5 0x6970667358 0x22 SLT KECCAK256 0xDD 0xD0 0xAC PUSH23 0x4A748B860A05A2BAD71EF10A1377F4843FA58405045327 0xC7 PUSH11 0x1B598A64736F6C63430008 BYTE STOP CALLER ",
+			"sourceMap": "179:10462:0:-:0;;;;;;;;"
+		},
+		"gasEstimates": {
+			"creation": {
+				"codeDepositCost": "17000",
+				"executionCost": "92",
+				"totalCost": "17092"
+			},
+			"internal": {
+				"_itemLength(uint256)": "infinite",
+				"_payloadOffset(uint256)": "infinite",
+				"copy(uint256,uint256,uint256)": "infinite",
+				"hasNext(struct RLPReader.Iterator memory)": "infinite",
+				"isList(struct RLPReader.RLPItem memory)": "infinite",
+				"iterator(struct RLPReader.RLPItem memory)": "infinite",
+				"next(struct RLPReader.Iterator memory)": "infinite",
+				"numItems(struct RLPReader.RLPItem memory)": "infinite",
+				"payloadKeccak256(struct RLPReader.RLPItem memory)": "infinite",
+				"payloadLen(struct RLPReader.RLPItem memory)": "infinite",
+				"payloadLocation(struct RLPReader.RLPItem memory)": "infinite",
+				"rlpBytesKeccak256(struct RLPReader.RLPItem memory)": "infinite",
+				"rlpLen(struct RLPReader.RLPItem memory)": "infinite",
+				"toAddress(struct RLPReader.RLPItem memory)": "infinite",
+				"toBoolean(struct RLPReader.RLPItem memory)": "infinite",
+				"toBytes(struct RLPReader.RLPItem memory)": "infinite",
+				"toList(struct RLPReader.RLPItem memory)": "infinite",
+				"toRlpBytes(struct RLPReader.RLPItem memory)": "infinite",
+				"toRlpItem(bytes memory)": "infinite",
+				"toUint(struct RLPReader.RLPItem memory)": "infinite",
+				"toUintStrict(struct RLPReader.RLPItem memory)": "infinite"
+			}
+		},
+		"methodIdentifiers": {}
+	},
+	"abi": []
+}

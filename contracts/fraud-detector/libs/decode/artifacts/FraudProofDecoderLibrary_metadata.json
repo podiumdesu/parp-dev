@@ -1,0 +1,389 @@
+{
+	"compiler": {
+		"version": "0.8.24+commit.e11b9ed9"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "channelId",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "Amount",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "LocalBlockHash",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "ReqBytes",
+						"type": "bytes"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "length",
+						"type": "uint256"
+					}
+				],
+				"name": "DecodeRequest",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "Type",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "ChannelId",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "Amount",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "ReqBodyHash",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "SignedReqBody",
+						"type": "bytes"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "CurrentBlockHeight",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "ReturnValue",
+						"type": "bytes"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes[]",
+						"name": "Proof",
+						"type": "bytes[]"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "TxHash",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "TxIdx",
+						"type": "bytes"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "Signature",
+						"type": "bytes"
+					}
+				],
+				"name": "DecodedResponse",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "Type",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "ChannelId",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "Amount",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "ReqBodyHash",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "SignedReqBody",
+						"type": "bytes"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "CurrentBlockHeight",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "ReturnValue",
+						"type": "bytes"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes[]",
+						"name": "Proof",
+						"type": "bytes[]"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "Address",
+						"type": "bytes"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "Signature",
+						"type": "bytes"
+					}
+				],
+				"name": "DecodedResponseSP",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "emitAmount",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "LocalBlockHash",
+						"type": "bytes32"
+					}
+				],
+				"name": "emitLocalBlockHash",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "msgHash",
+						"type": "bytes32"
+					}
+				],
+				"name": "msgHash",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "SignedReqBody",
+						"type": "bytes"
+					}
+				],
+				"name": "reqByte",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "ChannelId",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes[]",
+						"name": "proof",
+						"type": "bytes[]"
+					},
+					{
+						"internalType": "bytes",
+						"name": "SignedReqBody",
+						"type": "bytes"
+					},
+					{
+						"internalType": "bytes",
+						"name": "Address",
+						"type": "bytes"
+					},
+					{
+						"internalType": "uint256",
+						"name": "blockNr",
+						"type": "uint256"
+					}
+				],
+				"name": "getMessageHashSP",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "ChannelId",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "uint256",
+						"name": "Amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "LocalBlockHash",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes",
+						"name": "ReqBytes",
+						"type": "bytes"
+					}
+				],
+				"name": "getReqMessageHash",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/fraud-detector/libs/decode/msgDecoding.sol": "FraudProofDecoderLibrary"
+		},
+		"evmVersion": "shanghai",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": [],
+		"viaIR": true
+	},
+	"sources": {
+		"contracts/fraud-detector/libs/decode/msgDecoding.sol": {
+			"keccak256": "0x5f50a2f71c5a860ed29bb3749332371ad5a2ee6cf61a7eb920b81177a592ed71",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://91576cc5ed4e8281acca50eff86059909a91b37a97f433b6801a1071e6957ad8",
+				"dweb:/ipfs/QmVvyTj6LLSjJfZRKWG5nfoEqtBpxVmyL97Eb2n917ApaE"
+			]
+		},
+		"contracts/fraud-detector/libs/rlp/Helper.sol": {
+			"keccak256": "0xa5fc576de328eb9bc5920a970fc3507415fc4a87fd0e21f5175010b78d638163",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://3ca563e3be397a6a18db9cffe638716070195c0ccdbf8bfee685cc422fd07d99",
+				"dweb:/ipfs/QmVcgkJHCw8RMJA3rzRMy1DoGSR7cXmNYa75i1VQpKpVd2"
+			]
+		},
+		"contracts/fraud-detector/libs/rlp/RLPReader.sol": {
+			"keccak256": "0x77646c5ec25d5d9e83c7a28035f4574a4e4380e949a65b72cd0455e36136a306",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://3ecc9d16d221ce60cc42fa538b029b7c7410917bfe6999f37dcb2c9f9ba9d6fc",
+				"dweb:/ipfs/QmWkvHrioX3NiY7bKCtDnhAGRSJnBz6yBuhTrR5BEWrGhR"
+			]
+		},
+		"contracts/fraud-detector/types/events.sol": {
+			"keccak256": "0x873bfbac51bd9813a35077c8646d027526a4d8ba5d8cf802896f5bf5bbef4b37",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://dc372e370d630dee69b23f01a308c95e9fcda232faa681dfa8f5d9bc1f61d100",
+				"dweb:/ipfs/QmcGcKuBnaZycEoErhTgEEg97dJSNkwvwQND7uhhV99vmR"
+			]
+		},
+		"contracts/fraud-detector/types/message.sol": {
+			"keccak256": "0x09140b4a5c4aee43a96f6de7d6f8892e7f45a6bb6131d5eee2a2df70744d10a1",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://635d92fb7505a9e9e7647736203e2d4b4abe130eb1bb12e4b084bb7174b2777f",
+				"dweb:/ipfs/QmUL9ZnHVvJGob14NycTyhjYkPp99vtv9t8g6wuegWSGDF"
+			]
+		},
+		"contracts/fraud-detector/types/proof.sol": {
+			"keccak256": "0xc2b579dacc74e7de2b3ecf386287f3cecfcbd0d8ada14e14c4758ee610017924",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://8adb5b14e475f739ffe2f3e7d19f2ea0d99e19887d9eca777d047258cc8b5041",
+				"dweb:/ipfs/QmUMwX9xbBrrhj8TvJ6eMNztWWPiEgL3idoK7ENLdn8iZ8"
+			]
+		}
+	},
+	"version": 1
+}

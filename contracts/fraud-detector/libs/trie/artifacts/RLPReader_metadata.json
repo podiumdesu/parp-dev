@@ -1,0 +1,45 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/trie/RLPReader.sol": "RLPReader"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/trie/RLPReader.sol": {
+			"keccak256": "0x1fa57b232e586b2d8255a52902bf492d70274a1755a11866f3cb855ad032bd42",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://f06e4d138aa1d6eaf955a3600a9eab54011b799cdba2c6e999de1b9a912f6f59",
+				"dweb:/ipfs/QmTYrcvEAtcJ3DVPMN7UWvtunwFefndscTbjT3z1yD3YG3"
+			]
+		}
+	},
+	"version": 1
+}

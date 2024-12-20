@@ -1,0 +1,70 @@
+{
+	"id": "685881e27f89640be9f393aa6ef61fc5",
+	"_format": "hh-sol-build-info-1",
+	"solcVersion": "0.8.24",
+	"solcLongVersion": "0.8.24+commit.e11b9ed9",
+	"input": {
+		"language": "Solidity",
+		"sources": {
+			"contracts/fraud-detector/types.sol": {
+				"content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.17;\n\n\n"
+			}
+		},
+		"settings": {
+			"optimizer": {
+				"enabled": false,
+				"runs": 200
+			},
+			"outputSelection": {
+				"*": {
+					"": [
+						"ast"
+					],
+					"*": [
+						"abi",
+						"metadata",
+						"devdoc",
+						"userdoc",
+						"storageLayout",
+						"evm.legacyAssembly",
+						"evm.bytecode",
+						"evm.deployedBytecode",
+						"evm.methodIdentifiers",
+						"evm.gasEstimates",
+						"evm.assembly"
+					]
+				}
+			},
+			"remappings": [],
+			"evmVersion": "cancun"
+		}
+	},
+	"output": {
+		"sources": {
+			"contracts/fraud-detector/types.sol": {
+				"ast": {
+					"absolutePath": "contracts/fraud-detector/types.sol",
+					"exportedSymbols": {},
+					"id": 2,
+					"license": "MIT",
+					"nodeType": "SourceUnit",
+					"nodes": [
+						{
+							"id": 1,
+							"literals": [
+								"solidity",
+								"^",
+								"0.8",
+								".17"
+							],
+							"nodeType": "PragmaDirective",
+							"src": "32:24:0"
+						}
+					],
+					"src": "32:27:0"
+				},
+				"id": 0
+			}
+		}
+	}
+}

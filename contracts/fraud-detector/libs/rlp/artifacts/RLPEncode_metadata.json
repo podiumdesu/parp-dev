@@ -1,0 +1,49 @@
+{
+	"compiler": {
+		"version": "0.8.24+commit.e11b9ed9"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"author": "Bakaoh",
+			"details": "A simple RLP encoding library.",
+			"kind": "dev",
+			"methods": {},
+			"title": "RLPEncode",
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/fraud-detector/libs/rlp/RLPEncoder.sol": "RLPEncode"
+		},
+		"evmVersion": "shanghai",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": [],
+		"viaIR": true
+	},
+	"sources": {
+		"contracts/fraud-detector/libs/rlp/RLPEncoder.sol": {
+			"keccak256": "0x50c424dbc8921a2d6c7b8c25c15092e8c9ce3490f2a400329b4c78b5291db553",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://92ab9d0edb8499649a56b439fbb26cd07c49a8a54e3891181200f751ee4268aa",
+				"dweb:/ipfs/QmaDST6nR6wTg3JY1ZMCmDBrZBNuxXpi6ynD3fz3FbTQqV"
+			]
+		}
+	},
+	"version": 1
+}

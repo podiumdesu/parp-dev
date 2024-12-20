@@ -3,5 +3,5 @@ network/*
 .AppleDouble
 .LSOverride
 **/build/bin/
-
+useless/*
 

@@ -1,0 +1,527 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "bytesToString",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "customDestructure",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "customNestedDestructure",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "customNestedDestructureKeccak",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "customNestedToRlpBytes",
+				"outputs": [
+					{
+						"internalType": "bytes",
+						"name": "",
+						"type": "bytes"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "isList",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "itemLength",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "nestedIteration",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "numItems",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "payloadKeccak256",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "payloadLocation",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "payloadMemPtr",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "payloadLen",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "itemMemPtr",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "rlpBytesKeccak256",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "rlpLen",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "toAddress",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "rlpHeader",
+						"type": "bytes"
+					}
+				],
+				"name": "toBlockHeader",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "parentHash",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "sha3Uncles",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "stateRoot",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "transactionsRoot",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "receiptsRoot",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "uint256",
+						"name": "difficulty",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "number",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "gasLimit",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "gasUsed",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "nonce",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "toBoolean",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "toBytes",
+				"outputs": [
+					{
+						"internalType": "bytes",
+						"name": "",
+						"type": "bytes"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "toIterator",
+				"outputs": [],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "toRlpBytes",
+				"outputs": [
+					{
+						"internalType": "bytes",
+						"name": "",
+						"type": "bytes"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "toUint",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "item",
+						"type": "bytes"
+					}
+				],
+				"name": "toUintStrict",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/rlp/Helper.sol": "Helper"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/rlp/Helper.sol": {
+			"keccak256": "0xa5fc576de328eb9bc5920a970fc3507415fc4a87fd0e21f5175010b78d638163",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://3ca563e3be397a6a18db9cffe638716070195c0ccdbf8bfee685cc422fd07d99",
+				"dweb:/ipfs/QmVcgkJHCw8RMJA3rzRMy1DoGSR7cXmNYa75i1VQpKpVd2"
+			]
+		},
+		"contracts/rlp/RLPReader.sol": {
+			"keccak256": "0x77646c5ec25d5d9e83c7a28035f4574a4e4380e949a65b72cd0455e36136a306",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://3ecc9d16d221ce60cc42fa538b029b7c7410917bfe6999f37dcb2c9f9ba9d6fc",
+				"dweb:/ipfs/QmWkvHrioX3NiY7bKCtDnhAGRSJnBz6yBuhTrR5BEWrGhR"
+			]
+		}
+	},
+	"version": 1
+}

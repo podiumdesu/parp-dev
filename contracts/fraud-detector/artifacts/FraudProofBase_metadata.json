@@ -1,0 +1,88 @@
+{
+	"compiler": {
+		"version": "0.8.24+commit.e11b9ed9"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"name": "depositContract",
+				"outputs": [
+					{
+						"internalType": "contract IDepositContract",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "paychanContract",
+				"outputs": [
+					{
+						"internalType": "contract IPaychan",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/fraud-detector/FraudProofBase.sol": "FraudProofBase"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/fraud-detector/FraudProofBase.sol": {
+			"keccak256": "0xf5fdf57dc1d596e7741302d5b8a8a884fb1d9555d692d333206389b65c16ee07",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://1775980196616cc0c602e6d23b202bc932e8314247962f800524f38f54cd657d",
+				"dweb:/ipfs/QmZCCGXkNmCNYBgekgRXNMLv4y66VALREmiPMvQvcfSnch"
+			]
+		},
+		"contracts/fraud-detector/interfaces/IDeposit.sol": {
+			"keccak256": "0x9991601cbe787a8b85c5d6ce0eb3146854765f70179079235e4efa072e09ff69",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://bf676f505371cc4ae9ee218ceed33a4d980cb8e1bcdb94cba3e240e70d5bbc6a",
+				"dweb:/ipfs/QmQ2j2vTdVwbUkgie3KB4U3b8haae5vSxxCivNaSQex3No"
+			]
+		},
+		"contracts/fraud-detector/interfaces/IPayChan.sol": {
+			"keccak256": "0x8c3e70f44c7c43fa8382d011c4f0ddb65afec3230772bb6c8c8313e1462c32ae",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://ad98c245fe92ba3662c58db592590b3b0f3a6b44f732e3daae1145b65353caa5",
+				"dweb:/ipfs/QmZJawZNV7o5Y1MAz55R85Cvk4At58x2UhdY5tjsQMBhGg"
+			]
+		}
+	},
+	"version": 1
+}

@@ -1,0 +1,590 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"components": [
+							{
+								"internalType": "bool",
+								"name": "isEmpty",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isLeaf",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isHashedLeaf",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isNibbledValueBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isNibbledHashedValueBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isNibbledBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isExtension",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "uint256",
+								"name": "nibbleSize",
+								"type": "uint256"
+							},
+							{
+								"components": [
+									{
+										"internalType": "bytes",
+										"name": "data",
+										"type": "bytes"
+									},
+									{
+										"internalType": "uint256",
+										"name": "offset",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct ByteSlice",
+								"name": "data",
+								"type": "tuple"
+							}
+						],
+						"internalType": "struct NodeKind",
+						"name": "node",
+						"type": "tuple"
+					}
+				],
+				"name": "decodeBranch",
+				"outputs": [
+					{
+						"components": [
+							{
+								"components": [
+									{
+										"internalType": "bool",
+										"name": "isSome",
+										"type": "bool"
+									},
+									{
+										"components": [
+											{
+												"internalType": "bool",
+												"name": "isHash",
+												"type": "bool"
+											},
+											{
+												"internalType": "bytes32",
+												"name": "hash",
+												"type": "bytes32"
+											},
+											{
+												"internalType": "bool",
+												"name": "isInline",
+												"type": "bool"
+											},
+											{
+												"internalType": "bytes",
+												"name": "inLine",
+												"type": "bytes"
+											}
+										],
+										"internalType": "struct NodeHandle",
+										"name": "value",
+										"type": "tuple"
+									}
+								],
+								"internalType": "struct NodeHandleOption",
+								"name": "value",
+								"type": "tuple"
+							},
+							{
+								"components": [
+									{
+										"internalType": "bool",
+										"name": "isSome",
+										"type": "bool"
+									},
+									{
+										"components": [
+											{
+												"internalType": "bool",
+												"name": "isHash",
+												"type": "bool"
+											},
+											{
+												"internalType": "bytes32",
+												"name": "hash",
+												"type": "bytes32"
+											},
+											{
+												"internalType": "bool",
+												"name": "isInline",
+												"type": "bool"
+											},
+											{
+												"internalType": "bytes",
+												"name": "inLine",
+												"type": "bytes"
+											}
+										],
+										"internalType": "struct NodeHandle",
+										"name": "value",
+										"type": "tuple"
+									}
+								],
+								"internalType": "struct NodeHandleOption[16]",
+								"name": "children",
+								"type": "tuple[16]"
+							}
+						],
+						"internalType": "struct Branch",
+						"name": "",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"components": [
+							{
+								"internalType": "bool",
+								"name": "isEmpty",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isLeaf",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isHashedLeaf",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isNibbledValueBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isNibbledHashedValueBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isNibbledBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isExtension",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "uint256",
+								"name": "nibbleSize",
+								"type": "uint256"
+							},
+							{
+								"components": [
+									{
+										"internalType": "bytes",
+										"name": "data",
+										"type": "bytes"
+									},
+									{
+										"internalType": "uint256",
+										"name": "offset",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct ByteSlice",
+								"name": "data",
+								"type": "tuple"
+							}
+						],
+						"internalType": "struct NodeKind",
+						"name": "node",
+						"type": "tuple"
+					}
+				],
+				"name": "decodeExtension",
+				"outputs": [
+					{
+						"components": [
+							{
+								"components": [
+									{
+										"internalType": "bytes",
+										"name": "data",
+										"type": "bytes"
+									},
+									{
+										"internalType": "uint256",
+										"name": "offset",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct NibbleSlice",
+								"name": "key",
+								"type": "tuple"
+							},
+							{
+								"components": [
+									{
+										"internalType": "bool",
+										"name": "isHash",
+										"type": "bool"
+									},
+									{
+										"internalType": "bytes32",
+										"name": "hash",
+										"type": "bytes32"
+									},
+									{
+										"internalType": "bool",
+										"name": "isInline",
+										"type": "bool"
+									},
+									{
+										"internalType": "bytes",
+										"name": "inLine",
+										"type": "bytes"
+									}
+								],
+								"internalType": "struct NodeHandle",
+								"name": "node",
+								"type": "tuple"
+							}
+						],
+						"internalType": "struct Extension",
+						"name": "",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"components": [
+							{
+								"internalType": "bool",
+								"name": "isEmpty",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isLeaf",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isHashedLeaf",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isNibbledValueBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isNibbledHashedValueBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isNibbledBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isExtension",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "uint256",
+								"name": "nibbleSize",
+								"type": "uint256"
+							},
+							{
+								"components": [
+									{
+										"internalType": "bytes",
+										"name": "data",
+										"type": "bytes"
+									},
+									{
+										"internalType": "uint256",
+										"name": "offset",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct ByteSlice",
+								"name": "data",
+								"type": "tuple"
+							}
+						],
+						"internalType": "struct NodeKind",
+						"name": "node",
+						"type": "tuple"
+					}
+				],
+				"name": "decodeLeaf",
+				"outputs": [
+					{
+						"components": [
+							{
+								"components": [
+									{
+										"internalType": "bytes",
+										"name": "data",
+										"type": "bytes"
+									},
+									{
+										"internalType": "uint256",
+										"name": "offset",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct NibbleSlice",
+								"name": "key",
+								"type": "tuple"
+							},
+							{
+								"components": [
+									{
+										"internalType": "bool",
+										"name": "isHash",
+										"type": "bool"
+									},
+									{
+										"internalType": "bytes32",
+										"name": "hash",
+										"type": "bytes32"
+									},
+									{
+										"internalType": "bool",
+										"name": "isInline",
+										"type": "bool"
+									},
+									{
+										"internalType": "bytes",
+										"name": "inLine",
+										"type": "bytes"
+									}
+								],
+								"internalType": "struct NodeHandle",
+								"name": "value",
+								"type": "tuple"
+							}
+						],
+						"internalType": "struct Leaf",
+						"name": "",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "encoded",
+						"type": "bytes"
+					}
+				],
+				"name": "decodeNodeKind",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "bool",
+								"name": "isEmpty",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isLeaf",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isHashedLeaf",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isNibbledValueBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isNibbledHashedValueBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isNibbledBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isExtension",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "isBranch",
+								"type": "bool"
+							},
+							{
+								"internalType": "uint256",
+								"name": "nibbleSize",
+								"type": "uint256"
+							},
+							{
+								"components": [
+									{
+										"internalType": "bytes",
+										"name": "data",
+										"type": "bytes"
+									},
+									{
+										"internalType": "uint256",
+										"name": "offset",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct ByteSlice",
+								"name": "data",
+								"type": "tuple"
+							}
+						],
+						"internalType": "struct NodeKind",
+						"name": "",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/trie/EthereumTrieDB.sol": "EthereumTrieDB"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/trie/Bytes.sol": {
+			"keccak256": "0xd5624a311cb0cc5fd5df7e87715a6bde1ea57c9596fcfe1e79992f320bc2b33c",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://553877386f37d2a5d31640d875bcbb21ad557bcf0bd4fbb886ee4c7dc23415cf",
+				"dweb:/ipfs/QmSamHweTX1osbjEHy9Vtz3cyyvJCXAiHEVbv8JF6AZ2bg"
+			]
+		},
+		"contracts/trie/EthereumTrieDB.sol": {
+			"keccak256": "0x9ff79c2642df909bb88a3b45a0651569071ca899c50e315778587b9ae270b485",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://66fb4d8fd591c60bce54e3183b9ea6fb26d6120cac26df8f120c5e18305dfc00",
+				"dweb:/ipfs/QmcSiXjPNrzh5zJKo53YqZ2KMHtyoFYUuJMdDpJ7j971tE"
+			]
+		},
+		"contracts/trie/Memory.sol": {
+			"keccak256": "0x31877187eab669aa48e4eeb58a521d2b4f526a0cd6c16c9d3d819b6aa87b759b",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://925b76249c53b7b3a361867e95194914be3e105b0f8e517f0a2828e3ae57bb32",
+				"dweb:/ipfs/QmYvJ5mtNfLeJNsobxBazRPoMes49abxv5Umvdr1MK5ZPx"
+			]
+		},
+		"contracts/trie/NibbleSlice.sol": {
+			"keccak256": "0x06cb709d27758d228fefb0fd4f72e7824190723c0a5bef9c61bf33c37896e6e6",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://7c2860ceaa751f51952085cfc797d7b0980ccd36e43ff771a7cee45621cc8ede",
+				"dweb:/ipfs/QmekfeoJD56Nx5nNwdpDsRfCoggagq6y3pT2YA9CMt2Zsi"
+			]
+		},
+		"contracts/trie/Node.sol": {
+			"keccak256": "0x38fd986e9d7f98a54adee7c890f161666281d95d69e0ba30e9e4de315704bc37",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://7d0111c0a68e415d316d050c1043bbd2e11e6f3d9e1ec584b4cb8dfc82168a3d",
+				"dweb:/ipfs/QmT3C5nEwcVHxTqnWKAwfCXvUgUQiCLXrhWnzv3hxXz3wq"
+			]
+		},
+		"contracts/trie/RLPReader.sol": {
+			"keccak256": "0x1fa57b232e586b2d8255a52902bf492d70274a1755a11866f3cb855ad032bd42",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://f06e4d138aa1d6eaf955a3600a9eab54011b799cdba2c6e999de1b9a912f6f59",
+				"dweb:/ipfs/QmTYrcvEAtcJ3DVPMN7UWvtunwFefndscTbjT3z1yD3YG3"
+			]
+		}
+	},
+	"version": 1
+}

@@ -1,0 +1,160 @@
+{
+	"compiler": {
+		"version": "0.8.24+commit.e11b9ed9"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"components": [
+							{
+								"internalType": "bytes",
+								"name": "key",
+								"type": "bytes"
+							},
+							{
+								"internalType": "bytes",
+								"name": "value",
+								"type": "bytes"
+							}
+						],
+						"indexed": false,
+						"internalType": "struct StorageValue[]",
+						"name": "proofReturnValues",
+						"type": "tuple[]"
+					}
+				],
+				"name": "emitProofValues",
+				"type": "event"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/fraud-detector/libs/ProofHelper.sol": "FraudProofHelper"
+		},
+		"evmVersion": "shanghai",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": [],
+		"viaIR": true
+	},
+	"sources": {
+		"contracts/fraud-detector/libs/ProofHelper.sol": {
+			"keccak256": "0x35e6ee26eaf238594dfa75380658e7cd2faa98158617b79f1001b2baad34040a",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://456b93a3301a71378c95895a7fa617ba3eb89fb43f4d525bffb12017ca7e7741",
+				"dweb:/ipfs/QmcmMCd71Sv3oCeCGVpPBsbzydryqqKGsL3eY6AZCnzced"
+			]
+		},
+		"contracts/fraud-detector/libs/merkleverify.sol": {
+			"keccak256": "0xb0fc5351379fa692a283f21af6a7c213d96addd114ee36ca5daa65a2284204b8",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://c4f0f9602003b0e49072bd9261635bf95234d298bec972b20db6b24f6b65d051",
+				"dweb:/ipfs/QmPFZwum1K1CxoXjDN9bB9fpEmXQMA6uAaDQWht8RrShen"
+			]
+		},
+		"contracts/fraud-detector/libs/trie/Bytes.sol": {
+			"keccak256": "0xd5624a311cb0cc5fd5df7e87715a6bde1ea57c9596fcfe1e79992f320bc2b33c",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://553877386f37d2a5d31640d875bcbb21ad557bcf0bd4fbb886ee4c7dc23415cf",
+				"dweb:/ipfs/QmSamHweTX1osbjEHy9Vtz3cyyvJCXAiHEVbv8JF6AZ2bg"
+			]
+		},
+		"contracts/fraud-detector/libs/trie/EthereumTrieDB.sol": {
+			"keccak256": "0x9ff79c2642df909bb88a3b45a0651569071ca899c50e315778587b9ae270b485",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://66fb4d8fd591c60bce54e3183b9ea6fb26d6120cac26df8f120c5e18305dfc00",
+				"dweb:/ipfs/QmcSiXjPNrzh5zJKo53YqZ2KMHtyoFYUuJMdDpJ7j971tE"
+			]
+		},
+		"contracts/fraud-detector/libs/trie/Memory.sol": {
+			"keccak256": "0x31877187eab669aa48e4eeb58a521d2b4f526a0cd6c16c9d3d819b6aa87b759b",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://925b76249c53b7b3a361867e95194914be3e105b0f8e517f0a2828e3ae57bb32",
+				"dweb:/ipfs/QmYvJ5mtNfLeJNsobxBazRPoMes49abxv5Umvdr1MK5ZPx"
+			]
+		},
+		"contracts/fraud-detector/libs/trie/NibbleSlice.sol": {
+			"keccak256": "0x06cb709d27758d228fefb0fd4f72e7824190723c0a5bef9c61bf33c37896e6e6",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://7c2860ceaa751f51952085cfc797d7b0980ccd36e43ff771a7cee45621cc8ede",
+				"dweb:/ipfs/QmekfeoJD56Nx5nNwdpDsRfCoggagq6y3pT2YA9CMt2Zsi"
+			]
+		},
+		"contracts/fraud-detector/libs/trie/Node.sol": {
+			"keccak256": "0x38fd986e9d7f98a54adee7c890f161666281d95d69e0ba30e9e4de315704bc37",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://7d0111c0a68e415d316d050c1043bbd2e11e6f3d9e1ec584b4cb8dfc82168a3d",
+				"dweb:/ipfs/QmT3C5nEwcVHxTqnWKAwfCXvUgUQiCLXrhWnzv3hxXz3wq"
+			]
+		},
+		"contracts/fraud-detector/libs/trie/Option.sol": {
+			"keccak256": "0xb629529d39b1c80cf0f8f8e0ce1154a1069c45f03d1aff0e8ee4572518b94335",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://3c1843ae0658aca8c393b25e290f03a108ee8f300cac97f4318053eec6c0035e",
+				"dweb:/ipfs/QmXwYNK6XvaQSMrKSLMTNtsRkuiyG7VEVoH5miUysveqox"
+			]
+		},
+		"contracts/fraud-detector/libs/trie/RLPReader.sol": {
+			"keccak256": "0x1fa57b232e586b2d8255a52902bf492d70274a1755a11866f3cb855ad032bd42",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://f06e4d138aa1d6eaf955a3600a9eab54011b799cdba2c6e999de1b9a912f6f59",
+				"dweb:/ipfs/QmTYrcvEAtcJ3DVPMN7UWvtunwFefndscTbjT3z1yD3YG3"
+			]
+		},
+		"contracts/fraud-detector/libs/trie/TrieDB.sol": {
+			"keccak256": "0xfdee85a8e1c4b9ed857c4c794a0d90ce82764dfb59461f412af58bb951be5afa",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://6664ce9386bcd714a9e3ed4b185a952b8481cb0a2466ebd2879e58701874f82b",
+				"dweb:/ipfs/QmVXyG72SjuyitKiHGPBHhkyTeEw6g17YyyQWAMvDPD6wx"
+			]
+		},
+		"contracts/fraud-detector/types/events.sol": {
+			"keccak256": "0xb37cbe22e441836bdef8d27acc1efc22d7b50b7feee8a6ccde98698b2917a008",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://a9310e9b40f645a9f393fb3a5c18d4dee6f61997c2c30f5579b4b4381f69af65",
+				"dweb:/ipfs/QmWsB1tNmC5eoMxWThdGFnyFatsEM9c77dDy7HoBeCsaok"
+			]
+		},
+		"contracts/fraud-detector/types/proof.sol": {
+			"keccak256": "0xc2b579dacc74e7de2b3ecf386287f3cecfcbd0d8ada14e14c4758ee610017924",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://8adb5b14e475f739ffe2f3e7d19f2ea0d99e19887d9eca777d047258cc8b5041",
+				"dweb:/ipfs/QmUMwX9xbBrrhj8TvJ6eMNztWWPiEgL3idoK7ENLdn8iZ8"
+			]
+		}
+	},
+	"version": 1
+}

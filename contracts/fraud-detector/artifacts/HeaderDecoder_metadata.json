@@ -1,0 +1,256 @@
+{
+	"compiler": {
+		"version": "0.8.24+commit.e11b9ed9"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "parentHash",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "uncleHash",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "coinbase",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "stateRoot",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "txRoot",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "receiptRoot",
+						"type": "bytes32"
+					}
+				],
+				"name": "BasicHeaderDecoded",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "logsBloom",
+						"type": "bytes"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "difficulty",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "number",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "gasLimit",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "gasUsed",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "extraData",
+						"type": "bytes"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "mixDigest",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint64",
+						"name": "nonce",
+						"type": "uint64"
+					}
+				],
+				"name": "ExtendedHeaderDecoded",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "headerHash",
+						"type": "bytes32"
+					}
+				],
+				"name": "HeaderHashGenerated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"name": "LogBytes32",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "",
+						"type": "bytes"
+					}
+				],
+				"name": "LogRLPEncoded",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "LogUint",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "baseFee",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "withdrawalsRoot",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "blobGasUsed",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "excessBlobGas",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "parentBeaconRoot",
+						"type": "bytes32"
+					}
+				],
+				"name": "OptionalFieldsDecoded",
+				"type": "event"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/fraud-detector/newHeader.sol": "HeaderDecoder"
+		},
+		"evmVersion": "shanghai",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": [],
+		"viaIR": true
+	},
+	"sources": {
+		"contracts/fraud-detector/libs/rlp/RLPEncoder.sol": {
+			"keccak256": "0xadc6cbd649f5891cf09a12e67cb77b9c40b24954c8168e8fe4c51025f0d92f49",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://9f50a7bd139f20975c034e2001ffa9d969fffdafac730ed86723a4238e086b1f",
+				"dweb:/ipfs/QmSTmrbT3BvmkERpP3sVSTXGdVRGnWPoPKhRGav5mBspWr"
+			]
+		},
+		"contracts/fraud-detector/libs/rlp/RLPReader.sol": {
+			"keccak256": "0x77646c5ec25d5d9e83c7a28035f4574a4e4380e949a65b72cd0455e36136a306",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://3ecc9d16d221ce60cc42fa538b029b7c7410917bfe6999f37dcb2c9f9ba9d6fc",
+				"dweb:/ipfs/QmWkvHrioX3NiY7bKCtDnhAGRSJnBz6yBuhTrR5BEWrGhR"
+			]
+		},
+		"contracts/fraud-detector/newHeader.sol": {
+			"keccak256": "0xfcd78d5091632885863580e4dc5d44dcd0c5b5bbea37ef98fb9be15fa8d9652d",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8040c81a3a7c06375e008dcc36b04fcc8bb30009c6388c2997b099141d4ea546",
+				"dweb:/ipfs/QmdKVKPSkbVFJ4e94kNKBQMBFnmg8yBFwjdETqpYgLmXvy"
+			]
+		}
+	},
+	"version": 1
+}

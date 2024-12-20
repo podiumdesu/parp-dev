@@ -1,0 +1,74 @@
+{
+	"deploy": {
+		"VM:-": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"main:1": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"ropsten:3": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"rinkeby:4": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"kovan:42": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"goerli:5": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"Custom": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		}
+	},
+	"data": {
+		"bytecode": {
+			"functionDebugData": {},
+			"generatedSources": [],
+			"linkReferences": {},
+			"object": "6080806040523460175760399081601c823930815050f35b5f80fdfe5f80fdfea2646970667358221220a89b702b635e136d30f421b6adb99331043582d0c3d58b7649849cf7876a67bd64736f6c63430008180033",
+			"opcodes": "PUSH1 0x80 DUP1 PUSH1 0x40 MSTORE CALLVALUE PUSH1 0x17 JUMPI PUSH1 0x39 SWAP1 DUP2 PUSH1 0x1C DUP3 CODECOPY ADDRESS DUP2 POP POP RETURN JUMPDEST PUSH0 DUP1 REVERT INVALID PUSH0 DUP1 REVERT INVALID LOG2 PUSH5 0x6970667358 0x22 SLT KECCAK256 0xA8 SWAP12 PUSH17 0x2B635E136D30F421B6ADB99331043582D0 0xC3 0xD5 DUP12 PUSH23 0x49849CF7876A67BD64736F6C6343000818003300000000 ",
+			"sourceMap": "159:7679:0:-:0;;;;;;;;;;;;;;;;;;;;;"
+		},
+		"deployedBytecode": {
+			"functionDebugData": {},
+			"generatedSources": [],
+			"immutableReferences": {},
+			"linkReferences": {},
+			"object": "5f80fdfea2646970667358221220a89b702b635e136d30f421b6adb99331043582d0c3d58b7649849cf7876a67bd64736f6c63430008180033",
+			"opcodes": "PUSH0 DUP1 REVERT INVALID LOG2 PUSH5 0x6970667358 0x22 SLT KECCAK256 0xA8 SWAP12 PUSH17 0x2B635E136D30F421B6ADB99331043582D0 0xC3 0xD5 DUP12 PUSH23 0x49849CF7876A67BD64736F6C6343000818003300000000 ",
+			"sourceMap": "159:7679:0:-:0;;"
+		},
+		"gasEstimates": {
+			"creation": {
+				"codeDepositCost": "11400",
+				"executionCost": "infinite",
+				"totalCost": "infinite"
+			},
+			"internal": {
+				"concat(bytes memory,bytes memory)": "infinite",
+				"encodeAddress(address)": "infinite",
+				"encodeBool(bool)": "infinite",
+				"encodeBytes(bytes memory)": "infinite",
+				"encodeInt(int256)": "infinite",
+				"encodeLength(uint256,uint256)": "infinite",
+				"encodeList(bytes memory[] memory)": "infinite",
+				"encodeString(string memory)": "infinite",
+				"encodeUint(uint256)": "infinite",
+				"flatten(bytes memory[] memory)": "infinite",
+				"memcpy(uint256,uint256,uint256)": "infinite",
+				"toBinary(uint256)": "infinite"
+			}
+		},
+		"methodIdentifiers": {}
+	},
+	"abi": []
+}
