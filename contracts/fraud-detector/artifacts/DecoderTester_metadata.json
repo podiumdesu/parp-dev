@@ -1,0 +1,212 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"name": "ECDSAInvalidSignature",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "length",
+						"type": "uint256"
+					}
+				],
+				"name": "ECDSAInvalidSignatureLength",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "s",
+						"type": "bytes32"
+					}
+				],
+				"name": "ECDSAInvalidSignatureS",
+				"type": "error"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "signer",
+						"type": "address"
+					}
+				],
+				"name": "SignerRecovered",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "serializedReqBody",
+						"type": "bytes"
+					},
+					{
+						"internalType": "bytes",
+						"name": "res",
+						"type": "bytes"
+					}
+				],
+				"name": "testDecodeRequest",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "channelId",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "localBlockHash",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes",
+						"name": "reqBytes",
+						"type": "bytes"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "messageHash",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "signer",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"errors": {
+				"ECDSAInvalidSignature()": [
+					{
+						"details": "The signature derives the `address(0)`."
+					}
+				],
+				"ECDSAInvalidSignatureLength(uint256)": [
+					{
+						"details": "The signature has an invalid length."
+					}
+				],
+				"ECDSAInvalidSignatureS(bytes32)": [
+					{
+						"details": "The signature has an S value that is in the upper half order."
+					}
+				]
+			},
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {
+				"testDecodeRequest(bytes,bytes)": {
+					"notice": "Call the library’s decodeRequest and get back both the struct and the hash"
+				}
+			},
+			"notice": "A bare‑bones wrapper that calls your library’s decodeRequest.         Deploy this + the Library; no other contracts needed.",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/fraud-detector/fraudprooftest.sol": "DecoderTester"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/utils/cryptography/ECDSA.sol": {
+			"keccak256": "0x69f54c02b7d81d505910ec198c11ed4c6a728418a868b906b4a0cf29946fda84",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8e25e4bdb7ae1f21d23bfee996e22736fc0ab44cfabedac82a757b1edc5623b9",
+				"dweb:/ipfs/QmQdWQvB6JCP9ZMbzi8EvQ1PTETqkcTWrbcVurS7DKpa5n"
+			]
+		},
+		"contracts/fraud-detector/fraudprooftest.sol": {
+			"keccak256": "0xdde8a2bcbee4e472b47b0f4fc6a5ae02de23d49cbfd831784c9835b774d634b6",
+			"urls": [
+				"bzz-raw://99cae297e2ccf6a69b3b65c3ec81306c2699e3f975ff31065ec6c14057af19e3",
+				"dweb:/ipfs/QmdnPjcRCjAzTVmfVXtMmmFron2RtdokXSnEVuCq96MAiA"
+			]
+		},
+		"contracts/fraud-detector/libs/decode/msgDecoding.sol": {
+			"keccak256": "0x5f50a2f71c5a860ed29bb3749332371ad5a2ee6cf61a7eb920b81177a592ed71",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://91576cc5ed4e8281acca50eff86059909a91b37a97f433b6801a1071e6957ad8",
+				"dweb:/ipfs/QmVvyTj6LLSjJfZRKWG5nfoEqtBpxVmyL97Eb2n917ApaE"
+			]
+		},
+		"contracts/fraud-detector/libs/rlp/Helper.sol": {
+			"keccak256": "0xa5fc576de328eb9bc5920a970fc3507415fc4a87fd0e21f5175010b78d638163",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://3ca563e3be397a6a18db9cffe638716070195c0ccdbf8bfee685cc422fd07d99",
+				"dweb:/ipfs/QmVcgkJHCw8RMJA3rzRMy1DoGSR7cXmNYa75i1VQpKpVd2"
+			]
+		},
+		"contracts/fraud-detector/libs/rlp/RLPReader.sol": {
+			"keccak256": "0x77646c5ec25d5d9e83c7a28035f4574a4e4380e949a65b72cd0455e36136a306",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://3ecc9d16d221ce60cc42fa538b029b7c7410917bfe6999f37dcb2c9f9ba9d6fc",
+				"dweb:/ipfs/QmWkvHrioX3NiY7bKCtDnhAGRSJnBz6yBuhTrR5BEWrGhR"
+			]
+		},
+		"contracts/fraud-detector/types/events.sol": {
+			"keccak256": "0x873bfbac51bd9813a35077c8646d027526a4d8ba5d8cf802896f5bf5bbef4b37",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://dc372e370d630dee69b23f01a308c95e9fcda232faa681dfa8f5d9bc1f61d100",
+				"dweb:/ipfs/QmcGcKuBnaZycEoErhTgEEg97dJSNkwvwQND7uhhV99vmR"
+			]
+		},
+		"contracts/fraud-detector/types/message.sol": {
+			"keccak256": "0x09140b4a5c4aee43a96f6de7d6f8892e7f45a6bb6131d5eee2a2df70744d10a1",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://635d92fb7505a9e9e7647736203e2d4b4abe130eb1bb12e4b084bb7174b2777f",
+				"dweb:/ipfs/QmUL9ZnHVvJGob14NycTyhjYkPp99vtv9t8g6wuegWSGDF"
+			]
+		},
+		"contracts/fraud-detector/types/proof.sol": {
+			"keccak256": "0xc2b579dacc74e7de2b3ecf386287f3cecfcbd0d8ada14e14c4758ee610017924",
+			"license": "Apache2",
+			"urls": [
+				"bzz-raw://8adb5b14e475f739ffe2f3e7d19f2ea0d99e19887d9eca777d047258cc8b5041",
+				"dweb:/ipfs/QmUMwX9xbBrrhj8TvJ6eMNztWWPiEgL3idoK7ENLdn8iZ8"
+			]
+		}
+	},
+	"version": 1
+}

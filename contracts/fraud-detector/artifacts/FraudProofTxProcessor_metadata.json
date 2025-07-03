@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.24+commit.e11b9ed9"
+		"version": "0.8.26+commit.8a97fa7a"
 	},
 	"language": "Solidity",
 	"output": {
@@ -53,7 +53,7 @@
 			"bytecodeHash": "ipfs"
 		},
 		"optimizer": {
-			"enabled": false,
+			"enabled": true,
 			"runs": 200
 		},
 		"remappings": []
@@ -108,11 +108,11 @@
 			]
 		},
 		"contracts/fraud-detector/libs/decode/msgDecoding.sol": {
-			"keccak256": "0x81727620c4c6ae2904829c0bfd8239ebfe2d3b4d2aa39e4cba8517614ec7dbf7",
+			"keccak256": "0x5f50a2f71c5a860ed29bb3749332371ad5a2ee6cf61a7eb920b81177a592ed71",
 			"license": "Apache2",
 			"urls": [
-				"bzz-raw://1337da494c6dde7fc59c97404e8b9c2dc8db68784e2c07fcf843841a11ad20cc",
-				"dweb:/ipfs/QmZjzw2uRXaNYgCujz7F8gXJiMF6b1pYtzVwANkPbjXweY"
+				"bzz-raw://91576cc5ed4e8281acca50eff86059909a91b37a97f433b6801a1071e6957ad8",
+				"dweb:/ipfs/QmVvyTj6LLSjJfZRKWG5nfoEqtBpxVmyL97Eb2n917ApaE"
 			]
 		},
 		"contracts/fraud-detector/libs/merkleverify.sol": {
@@ -212,19 +212,19 @@
 			]
 		},
 		"contracts/fraud-detector/types/events.sol": {
-			"keccak256": "0x53fce0541a6ed31423c032a4c59057747da9716ff8420738d56412429d597128",
+			"keccak256": "0x873bfbac51bd9813a35077c8646d027526a4d8ba5d8cf802896f5bf5bbef4b37",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://23f2ccbda930e118796fb84d7e73060164347742f6d6d9bcb8a884ca56582cff",
-				"dweb:/ipfs/Qmah63DJTRUucd9fwHwiRKMkVC3yUwdCFEenRQ9DePrbn7"
+				"bzz-raw://dc372e370d630dee69b23f01a308c95e9fcda232faa681dfa8f5d9bc1f61d100",
+				"dweb:/ipfs/QmcGcKuBnaZycEoErhTgEEg97dJSNkwvwQND7uhhV99vmR"
 			]
 		},
 		"contracts/fraud-detector/types/message.sol": {
-			"keccak256": "0xb46eb7b60ebe1de78e8ae0b027a6166fbf99e7a3d4cd8e2524354b248b42659c",
+			"keccak256": "0x09140b4a5c4aee43a96f6de7d6f8892e7f45a6bb6131d5eee2a2df70744d10a1",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://6f30b7335a0f342bd3389e40b1d5f5c24b789578bfa0b8f381198897c02e2f4b",
-				"dweb:/ipfs/QmbMb15uju3vuuavKc8MaEGdRknQMnH1tJ8jGKPYEN7y96"
+				"bzz-raw://635d92fb7505a9e9e7647736203e2d4b4abe130eb1bb12e4b084bb7174b2777f",
+				"dweb:/ipfs/QmUL9ZnHVvJGob14NycTyhjYkPp99vtv9t8g6wuegWSGDF"
 			]
 		},
 		"contracts/fraud-detector/types/proof.sol": {

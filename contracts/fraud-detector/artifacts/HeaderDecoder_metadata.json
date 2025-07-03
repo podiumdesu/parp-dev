@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.24+commit.e11b9ed9"
+		"version": "0.8.26+commit.8a97fa7a"
 	},
 	"language": "Solidity",
 	"output": {
@@ -214,7 +214,7 @@
 		"compilationTarget": {
 			"contracts/fraud-detector/newHeader.sol": "HeaderDecoder"
 		},
-		"evmVersion": "shanghai",
+		"evmVersion": "cancun",
 		"libraries": {},
 		"metadata": {
 			"bytecodeHash": "ipfs"
@@ -223,8 +223,7 @@
 			"enabled": true,
 			"runs": 200
 		},
-		"remappings": [],
-		"viaIR": true
+		"remappings": []
 	},
 	"sources": {
 		"contracts/fraud-detector/libs/rlp/RLPEncoder.sol": {
@@ -244,11 +243,11 @@
 			]
 		},
 		"contracts/fraud-detector/newHeader.sol": {
-			"keccak256": "0xfcd78d5091632885863580e4dc5d44dcd0c5b5bbea37ef98fb9be15fa8d9652d",
+			"keccak256": "0x71f419fe7576afd7d55e99f551810ae4a6fdf7ada96c067948ccb6ebdd2c0489",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://8040c81a3a7c06375e008dcc36b04fcc8bb30009c6388c2997b099141d4ea546",
-				"dweb:/ipfs/QmdKVKPSkbVFJ4e94kNKBQMBFnmg8yBFwjdETqpYgLmXvy"
+				"bzz-raw://bd7a3ddc9df2cdcca734e46baa387f2e01b20556a8ee47bdda775cf0813bd5bd",
+				"dweb:/ipfs/QmRVuq4M9p9F3tRJYr63FzeF34UsiGYbRisVtb488Wn9tk"
 			]
 		}
 	},

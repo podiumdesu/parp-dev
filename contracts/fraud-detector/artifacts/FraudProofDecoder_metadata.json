@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.24+commit.e11b9ed9"
+		"version": "0.8.26+commit.8a97fa7a"
 	},
 	"language": "Solidity",
 	"output": {
@@ -65,19 +65,6 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
-						"internalType": "bytes[]",
-						"name": "Proof",
-						"type": "bytes[]"
-					}
-				],
-				"name": "emitProof",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
 						"components": [
 							{
 								"internalType": "bytes",
@@ -97,19 +84,6 @@
 					}
 				],
 				"name": "emitProofValues",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "bytes32",
-						"name": "msgHash",
-						"type": "bytes32"
-					}
-				],
-				"name": "msgHash",
 				"type": "event"
 			},
 			{
@@ -232,7 +206,7 @@
 		"compilationTarget": {
 			"contracts/fraud-detector/FraudProofDetector.sol": "FraudProofDecoder"
 		},
-		"evmVersion": "shanghai",
+		"evmVersion": "cancun",
 		"libraries": {},
 		"metadata": {
 			"bytecodeHash": "ipfs"
@@ -241,8 +215,7 @@
 			"enabled": true,
 			"runs": 200
 		},
-		"remappings": [],
-		"viaIR": true
+		"remappings": []
 	},
 	"sources": {
 		"@openzeppelin/contracts/utils/cryptography/ECDSA.sol": {
@@ -262,11 +235,11 @@
 			]
 		},
 		"contracts/fraud-detector/FraudProofDetector.sol": {
-			"keccak256": "0xe635a1cdef590f18c31dde812c6c438972d7f5d6cc9cd62db6a8adccbb311d83",
+			"keccak256": "0x4a66f6b4dedcaa52c28d7b3e53658ae77a517dd5d78f5206ea1ee771cf3a6367",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://0a8068a9dffcc01676a62b0192be97783a7cd952d749731fbe7400653751aff4",
-				"dweb:/ipfs/QmU8scGMDGT3kuSRPHzjaaB9AiZ5C5omCXihKsJrHtAZSN"
+				"bzz-raw://d596b571bcc1d0c4e43ab97c0f90821319f94296358e42b490e57e4da8095c4d",
+				"dweb:/ipfs/QmNcoPR3W7KQifMMg5G8ef3os59Jsirbjh7swqxAmZMpKv"
 			]
 		},
 		"contracts/fraud-detector/FraudProofSPProcessor.sol": {
@@ -414,11 +387,11 @@
 			]
 		},
 		"contracts/fraud-detector/newHeader.sol": {
-			"keccak256": "0xfcd78d5091632885863580e4dc5d44dcd0c5b5bbea37ef98fb9be15fa8d9652d",
+			"keccak256": "0x71f419fe7576afd7d55e99f551810ae4a6fdf7ada96c067948ccb6ebdd2c0489",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://8040c81a3a7c06375e008dcc36b04fcc8bb30009c6388c2997b099141d4ea546",
-				"dweb:/ipfs/QmdKVKPSkbVFJ4e94kNKBQMBFnmg8yBFwjdETqpYgLmXvy"
+				"bzz-raw://bd7a3ddc9df2cdcca734e46baa387f2e01b20556a8ee47bdda775cf0813bd5bd",
+				"dweb:/ipfs/QmRVuq4M9p9F3tRJYr63FzeF34UsiGYbRisVtb488Wn9tk"
 			]
 		},
 		"contracts/fraud-detector/types/channel.sol": {

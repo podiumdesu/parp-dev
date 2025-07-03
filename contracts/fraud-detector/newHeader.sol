@@ -9,6 +9,12 @@ library HeaderDecoder {
     using RLPReader for RLPReader.RLPItem;
     using RLPEncoder for bytes;
 
+    struct HeaderResults {
+        bytes32 headerHash;
+        bytes32 txRoot;
+        bytes32 stateRoot;
+    }
+
     struct BasicHeader {
         bytes32 parentHash;
         bytes32 uncleHash;
@@ -69,7 +75,7 @@ library HeaderDecoder {
     event HeaderHashGenerated(bytes32 headerHash);
     event LogUint(uint);
 
-    function decodeHeader(bytes memory rlpEncodedHeader) public returns (bytes32, bytes32, bytes32) {
+    function decodeHeader(bytes memory rlpEncodedHeader) public returns (HeaderResults memory) {
         RLPReader.RLPItem[] memory items = rlpEncodedHeader.toRlpItem().toList();
 
         // Decode and emit basic fields
@@ -85,7 +91,11 @@ library HeaderDecoder {
         emit HeaderHashGenerated(headerHash);
         emit HeaderHashGenerated(basic.txRoot);
         emit HeaderHashGenerated(basic.stateRoot);
-        return (headerHash, basic.txRoot, basic.stateRoot);
+        return HeaderResults({
+            headerHash: headerHash,
+            txRoot: basic.txRoot,
+            stateRoot: basic.stateRoot
+        });
 
         // bytes32 blockHash = blockhash(extended.number);
         // emit LogUint(extended.number); // Debug the block number
