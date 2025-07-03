@@ -26,8 +26,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/sslip/handlers"
-	"github.com/ethereum/go-ethereum/sslip/manager"
+	"github.com/ethereum/go-ethereum/parp/handlers"
+	"github.com/ethereum/go-ethereum/parp/manager"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"

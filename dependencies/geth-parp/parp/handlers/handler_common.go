@@ -5,9 +5,9 @@ import (
 	"log"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/parp/manager"
+	"github.com/ethereum/go-ethereum/parp/resmsg"
 	"github.com/ethereum/go-ethereum/poc-client/msg/request"
-	"github.com/ethereum/go-ethereum/sslip/manager"
-	"github.com/ethereum/go-ethereum/sslip/resmsg"
 )
 
 func verifyReqSignature(m *manager.Manager, clientID string, req request.RequestMsg) (bool, common.Hash, resmsg.ServerMsg, error) {

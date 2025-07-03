@@ -8,8 +8,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/parp/mpt"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/sslip/mpt"
 )
 
 func verifyProof(txHash common.Hash, proof mpt.Proof, blockNr *big.Int, key []byte) bool {

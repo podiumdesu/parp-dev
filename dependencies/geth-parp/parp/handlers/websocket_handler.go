@@ -11,12 +11,12 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/parp/manager"
+	"github.com/ethereum/go-ethereum/parp/mpt"
+	"github.com/ethereum/go-ethereum/parp/resmsg"
 	"github.com/ethereum/go-ethereum/poc-client/msg/handshake"
 	"github.com/ethereum/go-ethereum/poc-client/msg/request"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/sslip/manager"
-	"github.com/ethereum/go-ethereum/sslip/mpt"
-	"github.com/ethereum/go-ethereum/sslip/resmsg"
 	"github.com/gorilla/websocket"
 )
 

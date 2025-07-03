@@ -6,7 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	mClient "github.com/ethereum/go-ethereum/sslip/clients"
+	mClient "github.com/ethereum/go-ethereum/parp/clients"
 
 	"github.com/gorilla/websocket"
 )

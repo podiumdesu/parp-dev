@@ -12,10 +12,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ethereum/go-ethereum/sslip/handlers"
-	"github.com/ethereum/go-ethereum/sslip/manager"
+	"github.com/ethereum/go-ethereum/parp/handlers"
+	"github.com/ethereum/go-ethereum/parp/manager"
 
-	"github.com/ethereum/go-ethereum/sslip/resmsg"
+	"github.com/ethereum/go-ethereum/parp/resmsg"
 	"github.com/gorilla/websocket"
 )
 
