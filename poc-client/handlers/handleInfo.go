@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/ethereum/go-ethereum/sslip/resmsg"
+	"github.com/ethereum/go-ethereum/parp/resmsg"
 )
 
 func HandleInfo(msg []byte) error {

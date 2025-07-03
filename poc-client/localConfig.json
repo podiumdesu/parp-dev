@@ -3,5 +3,5 @@
     "bcWsEndpoint": "ws://127.0.0.1:8101",
     "bcRpcEndpoint": "http://127.0.0.1:8001",
     "serverEndpoint": "ws://127.0.0.1:8888/ws/",
-    "contractAddress": "0x3FB67694D071f0702A9C1664c601e5A1E63cE4d9"
+    "contractAddress": "0x38953aF2D9A9eb3ED4Eb06F49Cd2620e9D9F8A99"
 }

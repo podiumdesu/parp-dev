@@ -7,7 +7,7 @@ import (
 	"poc-client/utils/cryptoutil"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/sslip/resmsg"
+	"github.com/ethereum/go-ethereum/parp/resmsg"
 )
 
 func HandleMesssage(msg []byte, client *client.Client) error {

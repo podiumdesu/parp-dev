@@ -14,8 +14,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/ethereum/go-ethereum/sslip/mpt"
-	"github.com/ethereum/go-ethereum/sslip/resmsg"
+	"github.com/ethereum/go-ethereum/parp/mpt"
+	"github.com/ethereum/go-ethereum/parp/resmsg"
 )
 
 func HandleResponseSP(msg []byte, client *client.Client) error {

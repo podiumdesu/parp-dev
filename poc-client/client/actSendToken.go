@@ -16,6 +16,7 @@ func (c *Client) sendTokenTx(wg *sync.WaitGroup, hubSend chan<- []byte, recipien
 	defer wg.Done()
 	log.Println("\n------------------Send Token Tx request--------------------")
 	TokenTx, txHash, err := c.createTokenTx(recipient, tokenAmount)
+	log.Println("token transaction hash: ", txHash.Hex())
 	if err != nil {
 		log.Println("Failed to create Token Tx request: ", err)
 	}

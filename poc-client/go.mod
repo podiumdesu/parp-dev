@@ -2,9 +2,7 @@ module poc-client
 
 go 1.20
 
-// require github.com/ethereum/go-ethereum/sslip v0.0.1
-
-replace github.com/ethereum/go-ethereum => ../dependencies/geth-sslip
+replace github.com/ethereum/go-ethereum => ../dependencies/geth-parp
 
 require (
 	// github.com/ethereum/go-ethereum v1.13.12

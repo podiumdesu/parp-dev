@@ -12,9 +12,9 @@ import (
 	utils "poc-client/utils/common"
 	"poc-client/utils/cryptoutil"
 
-	"github.com/ethereum/go-ethereum/sslip/mpt"
+	"github.com/ethereum/go-ethereum/parp/mpt"
 
-	"github.com/ethereum/go-ethereum/sslip/resmsg"
+	"github.com/ethereum/go-ethereum/parp/resmsg"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"

@@ -7,7 +7,7 @@ import (
 	"poc-client/utils/cryptoutil"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/sslip/resmsg"
+	"github.com/ethereum/go-ethereum/parp/resmsg"
 )
 
 func HandleOpenChan(msg []byte, client *client.Client) error {
@@ -19,6 +19,8 @@ func HandleOpenChan(msg []byte, client *client.Client) error {
 		log.Println("Unmarshal error: ", err)
 		return err
 	}
+
+	log.Println("[CHANOPEN] Response Message: ", resMsg)
 
 	resMsgBodyHash := resMsg.Keccak256Hash()
 	res := cryptoutil.VerifyHash(crypto.FromECDSAPub(client.ServerPublicKey), resMsgBodyHash, resMsg.Signature)

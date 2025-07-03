@@ -51,8 +51,10 @@ func (c *Client) createOpenChanTx() ([]byte, common.Hash, error) {
 	nonce := c.GetNonce(onChainNonce)
 	fnAddr := common.HexToAddress(cryptoutil.PubkeyToHexAddr(c.ServerPublicKey))
 	log.Println("fnAddr: ", fnAddr)
-	// fnAddr := common.HexToAddress("0xA2131E7503F7Dd11ff5dAAC09fa7c301e7Fe0f30")
+
 	deposit := big.NewInt(200000)
+
+	log.Println("contract address: ", c.ContractAddress)
 	openChanSignTx, txHash := protocol.OpenChanTx(bcClient, c.PrivateKey, fnAddr, deposit, nonce, common.HexToAddress(c.ContractAddress))
 
 	msg := c.generateParpRequest(c.ChannelID, c.Amount+100, openChanSignTx, blockHeader.Hash())
